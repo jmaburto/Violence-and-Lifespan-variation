@@ -1,7 +1,3 @@
-# TR:
-# Aggregator / reshaper function:
-# TR: this function replaces the for loops. Now everything
-# a little more robust and explicit.
 
 my_reshape.function <- function(i,DecompIn, lower = 0, upper = 15){
   Z        <- DecompIn[[i]]
@@ -66,7 +62,7 @@ AKm02a0 <- function(m0, sex = "m"){
   )
 }
 
-LTuniform <- function(mx,sex = "f"){
+LifeTable <- function(mx,sex = "f"){
   mx <- as.matrix(mx)
   #install.packages("/home/tim/git/HMDLifeTables/HMDLifeTables/HMDLifeTables",repos=NULL)
   #require(HMDLifeTables)
@@ -116,7 +112,7 @@ LTuniform <- function(mx,sex = "f"){
   list(e0=ex[1,],ex=ex,lx=lx,mx=mx)
 }
 
-LTuniformvecminimal <- compiler::cmpfun(function(mx,sex = "f"){
+LifeExpectancy <- compiler::cmpfun(function(mx,sex = "f"){
   i.openage <- length(mx)
   OPENAGE   <- i.openage - 1
   RADIX     <- 1
@@ -137,32 +133,68 @@ LTuniformvecminimal <- compiler::cmpfun(function(mx,sex = "f"){
   ex[1]
 })
 
-sm.mat.2   <- function(DX, EX){
-  ages  		<- 0:109
-  years 		<- 1990:2015
-  W     		<- EX
-  W[W > 0] 	<- 1
-  W[DX < 1 & W == 1] 	<- .3
-  mxs         <- W * 0
-  for (i in 1:ncol(mxs)){
-    fiti   	<- Mort1Dsmooth(
+edagger.frommx <- function(mx,sex){
+  i.openage <- length(mx)
+  OPENAGE   <- i.openage - 1
+  RADIX     <- 1
+  ax        <- mx * 0 + .5
+  ax[1]     <- AKm02a0(m0 = mx[1], sex = sex)
+  qx        <- mx / (1 + (1 - ax) * mx)
+  qx[i.openage]       <- ifelse(is.na(qx[i.openage]), NA, 1)
+  ax[i.openage]       <- 1 / mx[i.openage]
+  if (ax[i.openage]==Inf){ax[i.openage] <- .5}
+  px 				    <- 1 - qx
+  px[is.nan(px)]      <- 0
+  lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
+  dx 				    <- lx * qx
+  Lx 				    <- lx - (1 - ax) * dx
+  Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
+  Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
+  ex 				    <- Tx / lx
+  v <- (sum(dx[-i.openage]* (ex[-i.openage] + ax[-i.openage]*(ex[-1]-ex[-i.openage]) )) + ex[i.openage])
+  v[1]
+}
+
+e0frommxc <- function(mxcvec,sex){
+  dim(mxcvec) <- c(110,length(mxcvec)/110)
+  mx          <- rowSums(mxcvec)
+  LifeExpectancy(mx,sex)
+}
+
+edaggerfrommxc <- function(mxcvec,sex){
+  dim(mxcvec) <- c(110,length(mxcvec)/110)
+  mx          <- rowSums(mxcvec)
+  edagger.frommx(mx,sex)
+}
+
+sm.mat.2   <- function(DX, EX, Years = years){
+  ages  		  <- 0:109
+  W     		  <- EX*0
+  W[EX == 0] 	<- 1
+  #W[W > 0] 	  <- 0
+  mxs         <- DX * 0
+  for (j in 1:ncol(mxs)){
+    fit   	<- Mort1Dsmooth(
       x = ages, 
-      y = DX[,i],
-      offset = log(EX[,i]), 
-      w = W[,i],
-      control=list(MAX.IT=200))
+      y = DX[,j],
+      offset = log(EX[,j]), 
+      w = W[,j],
+      #control=list(MAX.IT=200),
+      method = 3,
+      lambda = 1e3
+      )
     
     mxsi 	<- exp(fit$logmortality)
-    mxs[,i] <- mxsi
+    mxs[,j] <- mxsi
   }
   
   mxs <- melt(mxs, varnames=c("age","year"), value.name = "mxs")
   mxs
 }
 
-sm.chunk.2 <- function(.SD,i){
-  DX      <- acast(.SD, age~year, value.var = colnames(Counts)[i], fill = 0)
-  EX      <- acast(.SD, age~year, value.var = "Pop", fill = 0)
+sm.chunk.2 <- function(.SD,i,...){
+  DX      <- acast(.SD, age~year, value.var = colnames(National)[i], fill = 0,drop = F)
+  EX      <- acast(.SD, age~year, value.var = "Pop", fill = 0,drop=F)
   
   mxs     <- sm.mat.2(DX,EX)
   
@@ -173,12 +205,18 @@ sm.chunk.2 <- function(.SD,i){
 }
 
 # useful labels
-CoD.name.vec <- c('Infectious and respiratory', 'Cancers', 'Circulatory', 
+CoD.name.vec <- c('Infectious and respiratory', 'Cancers', 'Circulatory',
                   'Birth conditions', 'Diabetes', 'Other AMS', 'IHD', 'HIV', 
                   'Suicide', 'Lung Cancer', 'Cirrhosis', 'Homicide',
-                  'Road traffic accidents', 'Other heart diseases', 'ILL-defined')
+                  'Road traffic accidents', 'Other heart diseases', 'ILL-defined', 'All-NonAm')
 
 CoD.code.vec <- 1:16
+
+CoD.name.vec2 <- c('Amenable','Diabetes','IHD', 'HIV', 
+                  'Suicide', 'Lung Cancer', 'Cirrhosis', 'Homicide',
+                  'Road traffic accidents', 'Other')
+
+CoD.code.vec2 <- 1:10
 
 state.name.vec <- c("Aguascalientes","Baja California","Baja California Sur","Campeche",
                     "Coahuila","Colima","Chiapas","Chihuahua","Mexico City","Durango",
