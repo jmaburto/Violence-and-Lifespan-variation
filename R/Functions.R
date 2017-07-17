@@ -1,33 +1,60 @@
 
-my_reshape.function <- function(i,DecompIn, lower = 0, upper = 15){
+my_reshape.function <- function(i=names(x)[1],DecompIn=x){
+  
   Z        <- DecompIn[[i]]
-  # and I'm going to append Age and State before
-  # rbind.list.ing
-  
-  Z        <- lapply(1:length(Z), function(ii,Z){
-    XX       <- as.data.frame(Z[[ii]])
-    XX$State <- ii
-    XX$Age   <- 0:109
+  Z.names  <- names(Z)
+  ZZ        <- lapply(Z.names, function(ii,Z,i){
+    Z2      <- Z[[as.character(ii)]]
+    XX      <- cbind(state=as.integer(i),year=as.integer(ii),age=0:109,Z2)
     XX
-  }, Z = Z)
+  }, Z = Z,i=i)
   # now stick it together
-  D        <- do.call(rbind.data.frame, Z)
-  # select age range
-  D        <- subset(D, Age >= lower & Age < upper)
-  # toggle to long
-  
-  DT       <- as.data.table(melt(D, 
-                                 id.vars = list("State","Age"),
-                                 variable.name = "AMCategory"))
-  # replaces aggregate()
-  DT       <- DT[, list(Contribution = sum(value)), by = list(State,AMCategory)]
-  # add year
-  DT$Year  <- 1989 + i
-  DT
+  D        <- as.data.frame(do.call(rbind, ZZ))
+  D        <- data.table(D)
+  #DT       <- as.data.table(melt(D, 
+  #                               id.vars = list("state","year","age"),
+  #                               variable.name = "Cause"))
+  D
 }
 
-# now apply this function the the crazy list objects containing 
-# decomposition results.
+
+
+
+mysmoothing <- function(MDx = MDx, nage =  nage, ages= ages, range.smooth = c(10^0 , 10^8)){
+  Cause          <- MDx$Cause.ind
+  if (Cause[1] == 4) {Dxs <- MDx$Dx} else {
+  EX             <- MDx$Pop
+  W     		     <- EX*0
+  W[EX != 0] 	   <- 1
+  DX             <- MDx$Dx
+  fit            <- Mort1Dsmooth(x = ages[nage:length(ages)], y = DX[nage:length(ages)],offset = log(EX[nage:length(ages)]), 
+                                 w = W[nage:length(ages)],control = list(RANGE=range.smooth))
+  Dxs            <- DX
+  Dxs[nage:length(ages)] <- fit$fitted.values
+#Dxs            <- c(DX[1:(nage-1)],fit$fitted.values,DX[(length(ages)+1):length(DX)])
+  }
+  return(Dxs)
+}
+
+mysmooth.warning <- function(MDx = .SD, nage =  nage, ages= ages,...){
+  out <- tryCatch(
+    {
+      mysmoothing(MDx = MDx, nage =  nage, ages= ages, range.smooth = c(10^0 , 10^8))
+    },
+    error = function(e){
+      message('Not smoothing this one')
+    }
+  )
+  if (is.null(out)) {return(MDx$Dx)} else {return(out)}
+}
+
+mysmooth.DT <- function(DT = Data_Counts, nage = 3, ages,...){
+  DT.melt           <- melt.data.table(data = DT, id.vars = 1:5, variable.name = 'Cause',measure.vars = 6:20,value.name = 'Dx',fill = 0, drop = F)
+  DT.melt$Cause     <- as.integer(as.character(DT.melt$Cause))
+  DT.melt$Cause.ind <- DT.melt$Cause
+  DT.smooth         <- DT.melt[,list(age = 0:109, Dxs = mysmooth.warning(MDx = .SD, nage =  nage, ages= ages)), by = list(year,sex,state,Cause)]
+  return(DT.smooth)
+}
 
 #Decomposition function
 mydecomp <- function (func, rates1, rates2, N, ...) {
@@ -63,53 +90,40 @@ AKm02a0 <- function(m0, sex = "m"){
 }
 
 LifeTable <- function(mx,sex = "f"){
-  mx <- as.matrix(mx)
-  #install.packages("/home/tim/git/HMDLifeTables/HMDLifeTables/HMDLifeTables",repos=NULL)
-  #require(HMDLifeTables)
-  i.openage <- nrow(mx)
-  ax        <- mx * 0 + .5                                          # ax = .5, pg 38 MPv5
+  i.openage <- length(mx)
+  OPENAGE   <- i.openage - 1
+  RADIX     <- 1
+  ax        <- mx * 0 + .5
+  ax[1]     <- AKm02a0(m0 = mx[1], sex = sex)
+  qx        <- mx / (1 + (1 - ax) * mx)
+  qx[i.openage]       <- ifelse(is.na(qx[i.openage]), NA, 1)
+  ax[i.openage]       <- 1 / mx[i.openage]
+  if (ax[i.openage]==Inf){ax[i.openage] <- .5}
+  px 				    <- 1 - qx
+  px[is.nan(px)]      <- 0
+  lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
+  dx 				    <- lx * qx
+  dx[i.openage] <-0
+  Lx 				    <- lx - (1 - ax) * dx
+  Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
+  Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
+  ex 				    <- Tx / lx
   
-  ax[1, ]   <- AKm02a0(m0 = mx[1, ], sex = sex)
-  
-  #  if (testa0){
-  #    ax[1, ]   <- AKm02a0_direct(m0 = mx[1, ], sex = sex)
-  #  }
-  # multiplying 2 matrices using '*' does the hadamard product in R (elementwise).
-  qx        <- mx / (1 + (1 - ax) * mx)                             # Eq 60 MPv5
-  # ---------------------------------------------------------------------------------
-  # set open age qx to 1
-  qx[i.openage, ]       <- ifelse(is.na(qx[i.openage, ]), NA, 1)
-  ax[i.openage, ]       <- 1 / mx[i.openage, ]                   
-  # ---------------------------------------------------------------------------------
-  # define remaining lifetable columns:
-  px 				      <- 1 - qx 																				# Eq 64 MPv5
-  px[is.nan(px)]  <- 0 # skips BEL NAs, as these are distinct from NaNs
-  # lx needs to be done columnwise over px, argument 2 refers to the margin.
-  lx 			        <- apply(px, 2, function(px., RADIX, OPENAGE){ 		# Eq 65 MPv5
-    if (all(is.na(px.))) {
-      px.
-    } else {
-      c(RADIX, RADIX * cumprod(px.[1:OPENAGE]))
-    }
-  }, RADIX = 1, OPENAGE = i.openage - 1
-  )
-  rownames(lx)    <- 0:(i.openage - 1) # these got thrown off because l0 imputed.
-  # NA should only be possible if there was a death with no Exp below age 80- impossible, but just to be sure
-  # lx[is.na(lx)]   <- 0 # removed for BEL testing        
-  dx 				      <- lx * qx 																				# Eq 66 MPv5
-  Lx 				      <- lx - (1 - ax) * dx 														# Eq 67 MPv5
-  
-  Lx[i.openage, ]	<- lx[i.openage, ] * ax[i.openage, ]
-  # we need to do operations on Lx, but taking its NAs to mean 0
-  # Lx[is.na(Lx)] 	<- 0 # removed for BEL testing
-  # Tx needs to be done columnwise over Lx, argument 2 refers to the column margin.
-  Tx 				      <- apply(Lx, 2, function(Lx., i.openage, OPENAGE){
-    c(rev(cumsum(rev(Lx.[1:OPENAGE]))),0) + Lx.[i.openage]	# Eq 68 MPv5
-  }, OPENAGE = i.openage - 1, i.openage = i.openage
-  )
-  rownames(Tx)    <- rownames(lx)
-  ex 				      <- Tx / lx 	                                      # Eq 69 MPv5
-  list(e0=ex[1,],ex=ex,lx=lx,mx=mx)
+  v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
+  v[length(ex)] <- ex[length(ex)]
+  v <- dx*v
+  e.dagger <- rev(cumsum(v))/lx
+  Lifetable       <- cbind(age=0:109,lx=lx,dx=dx,ex=ex,e.dagger=e.dagger)
+  return(Lifetable)
+  #list(e0=ex[1,],ex=ex,lx=lx,mx=mx)
+}
+
+LifeTable.DT <- function(.SD){
+  mx <- .SD$mx
+  sex <- 'm'
+  if (.SD$sex[1] > 1) {sex <- 'f'}
+  LT.DT <- LifeTable(mx=mx,sex=sex)
+  return(LT.DT)
 }
 
 LifeExpectancy <- compiler::cmpfun(function(mx,sex = "f"){
@@ -126,12 +140,14 @@ LifeExpectancy <- compiler::cmpfun(function(mx,sex = "f"){
   px[is.nan(px)]      <- 0
   lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
   dx 				    <- lx * qx
+  dx[i.openage] <-0
   Lx 				    <- lx - (1 - ax) * dx
   Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
   Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
   ex 				    <- Tx / lx
   ex[1]
 })
+
 
 edagger.frommx <- function(mx,sex){
   i.openage <- length(mx)
@@ -147,12 +163,17 @@ edagger.frommx <- function(mx,sex){
   px[is.nan(px)]      <- 0
   lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
   dx 				    <- lx * qx
+  dx[i.openage] <-0
   Lx 				    <- lx - (1 - ax) * dx
   Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
   Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
   ex 				    <- Tx / lx
-  v <- (sum(dx[-i.openage]* (ex[-i.openage] + ax[-i.openage]*(ex[-1]-ex[-i.openage]) )) + ex[i.openage])
-  v[1]
+  
+  v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
+  v[length(ex)] <- ex[length(ex)]
+  v <- dx*v
+  e.dagger <- rev(cumsum(v))/lx
+  e.dagger[1]
 }
 
 e0frommxc <- function(mxcvec,sex){
@@ -167,67 +188,4 @@ edaggerfrommxc <- function(mxcvec,sex){
   edagger.frommx(mx,sex)
 }
 
-sm.mat.2   <- function(DX, EX, Years = years){
-  ages  		  <- 0:109
-  W     		  <- EX*0
-  W[EX == 0] 	<- 1
-  #W[W > 0] 	  <- 0
-  mxs         <- DX * 0
-  for (j in 1:ncol(mxs)){
-    fit   	<- Mort1Dsmooth(
-      x = ages, 
-      y = DX[,j],
-      offset = log(EX[,j]), 
-      w = W[,j],
-      #control=list(MAX.IT=200),
-      method = 3,
-      lambda = 1e3
-      )
-    
-    mxsi 	<- exp(fit$logmortality)
-    mxs[,j] <- mxsi
-  }
-  
-  mxs <- melt(mxs, varnames=c("age","year"), value.name = "mxs")
-  mxs
-}
 
-sm.chunk.2 <- function(.SD,i,...){
-  DX      <- acast(.SD, age~year, value.var = colnames(National)[i], fill = 0,drop = F)
-  EX      <- acast(.SD, age~year, value.var = "Pop", fill = 0,drop=F)
-  
-  mxs     <- sm.mat.2(DX,EX)
-  
-  .SD$mxs <- mxs$mxs
-  
-  # still need to normalize exposure?
-  .SD
-}
-
-# useful labels
-CoD.name.vec <- c('Infectious and respiratory', 'Cancers', 'Circulatory',
-                  'Birth conditions', 'Diabetes', 'Other AMS', 'IHD', 'HIV', 
-                  'Suicide', 'Lung Cancer', 'Cirrhosis', 'Homicide',
-                  'Road traffic accidents', 'Other heart diseases', 'ILL-defined', 'All-NonAm')
-
-CoD.code.vec <- 1:16
-
-CoD.name.vec2 <- c('Amenable','Diabetes','IHD', 'HIV', 
-                  'Suicide', 'Lung Cancer', 'Cirrhosis', 'Homicide',
-                  'Road traffic accidents', 'Other')
-
-CoD.code.vec2 <- 1:10
-
-state.name.vec <- c("Aguascalientes","Baja California","Baja California Sur","Campeche",
-                    "Coahuila","Colima","Chiapas","Chihuahua","Mexico City","Durango",
-                    "Guanajuato","Guerrero","Hidalgo","Jalisco","Mexico State","Michoacan",
-                    "Morelos","Nayarit","Nuevo Leon","Oaxaca","Puebla","Queretaro",
-                    "Quintana Roo","San Luis Potosi","Sinaloa","Sonora","Tabasco","Tamaulipas",
-                    "Tlaxcala","Veracruz","Yucatan","Zacatecas")
-
-state.code.vec <- 1:32
-
-region.recvec            <- c(2,3,3,1,3,2,1,3,2,3,2,1,2,2,2,
-                              2,1,2,3,1,1,2,1,3,3,3,1,3,2,1,1,3)
-
-names(region.recvec)     <- 1:32
