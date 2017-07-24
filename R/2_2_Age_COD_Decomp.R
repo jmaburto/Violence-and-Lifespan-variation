@@ -20,6 +20,10 @@ source('R/Functions.R')
 #mx <- DT.mxCOD[year==1995 & sex == 1 & state==0,]$mx
 #sex = 'f'
 
+#training data
+#DT.mxCOD <- DT.mxCOD[state == 0,]
+#training.data
+
 #get decompositin of changes in life expectancy and life disparity by age and cause of death
 
 # some useful indicators

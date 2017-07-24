@@ -32,12 +32,14 @@ load('Data/Smooth_Deaths.RData')
 Dxs <- Dxs[,Dxs.prop := Dxs/sum(Dxs), by = list(year,sex,state,age)]
 Dxs[is.na(Dxs.prop),]$Dxs.prop <- 0
 
+
 #Get data for deaths and population
 load('Data/Deaths_CONAPO.rdata')
 load('Data/Population_CONAPO.rdata')
 Nx     <- (basepryentMX)
 Dx     <- (defspry)
 gdata:: keep(Dxs,Nx,Dx,sure = T)
+source('R/Functions.R')
 
 # Get homogeneous datasets
 # rename variables
@@ -63,9 +65,39 @@ Dxs <- Dxs[order(year,sex,state,Cause,age),]
 DxNx<- merge(Dx,Nx,all = T)
 # estimate age.specific mortality rates
 DxNx                <- DxNx[,mx :=Dx/Nx]
-DxNx[is.na(mx),]$mx <- 0
-DxNx[is.infinite(mx),]$mx <- 0
+# maybe a good idea to fit a Kannisto model for the last ages
+sort(unique(DxNx[is.na(mx),]$age))
+sort(unique(DxNx[is.infinite(mx),]$age))
+sort(unique(DxNx[mx > 1,]$age))
 
+# example
+# mx  <- DxNx[year==1995 & sex == 1 & state == 0,]$mx
+# LT1 <- LifeTable(mx,sex='m')
+# 
+# library(latticeExtra)
+# f1 <- xyplot(log(mx) ~ 0:109, xlim= c(0,120), ylim = c(-9,0))
+# f1
+# fit_kan <- Kannisto(mx = mx[81:95], x = 80:94)
+# mx2 <- predict.Kannisto(fit_kan,94:109)
+# f3 <- xyplot(log(mx2) ~ 80:109, type = 'l')
+# f1+f3
+# mx[95:110] <- mx2
+# xyplot(mx ~ 0:109, xlim= c(0,120))
+
+#now fit a Kannisto model to all data
+DxNx <- DxNx[order(year,sex,state,age),]
+DxNx <- DxNx[,mxn := my.kannisto.fun(mx,x=80:94), by = list(year,sex,state)]
+sort(unique(DxNx[is.na(mxn),]$age))
+sort(unique(DxNx[is.infinite(mxn),]$age))
+sort(unique(DxNx[mxn > 1,]$age))
+DxNx <- DxNx[,-c(7)]
+colnames(DxNx) <- c(colnames(DxNx)[1:6],'mx')
+
+#DxNx[is.na(mx),]$mx <- 0
+#DxNx[is.infinite(mx),]$mx <- 0
+#DxNx[mx > 1,]$mx <- 1
+
+#plot(0:109, dx)
 
 # Now transform Dxs to have a similar shape as DxNx
 Dxs.cast <- dcast(Dxs,year+sex+state+age ~ Cause,value.var = 'Dxs.prop')

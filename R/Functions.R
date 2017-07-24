@@ -1,3 +1,94 @@
+my.kannisto.fun <- function(mx = mx, x=80:94){
+  mx2 <- mx
+  fit_kan    <- Kannisto(mx=mx[x+1],x=x)
+  mx.new     <- predict.Kannisto(fit_kan,94:109)
+  mx2[95:110] <- mx.new
+  mx2
+}
+
+
+
+fun_data_prep <- function(mx, x = 80:94, n_parameters = 2){
+  # Format input data
+  mx <- as.matrix(mx)
+  x  <- as.numeric(x)
+  c_names <- if (is.null(ncol(mx)) | ncol(mx) == 1) 'mx' else colnames(mx)
+  dimnames(mx) <- list(x, c_names)
+  c_no    <- ncol(mx)
+  mx <- mx + (mx == 0)*1e-04 # If death rate is 0 we assign a very small value
+  # Scale the age vectors in order to obtain meaningful parameter estimates
+  x_scaled <- x - min(x)
+  # Create storage objects for parametes and fitted mx's
+  pars <- matrix(NA, c_no, n_parameters)
+  dimnames(pars) <- list(c_names, letters[1:n_parameters] )
+  fitted.values <- mx*0
+  # Output
+  return(list(mx = mx, x = x, x_scaled = x_scaled,
+              pars = pars, fitted.values = fitted.values,
+              n_parameters = n_parameters))
+}
+
+Fun_ux <- function(model){
+  switch(model,
+         kannisto = function(par, x) {
+           with(as.list(par), a*exp(b*x) / (1 + a*exp(b*x)) ) 
+         })
+}
+
+
+Kannisto <- function(mx = dta, x = 80:90, parS = NULL){
+  all_data <- fun_data_prep(mx, x, n_parameters = 2)
+  with(all_data,
+       {
+         mx <- as.matrix(mx)
+         x  <- as.numeric(x)
+         if (min(x) < 80 | max(x) > 100) {
+           cat('The Kannisto model is usually fitted in the 80-100 age-range\n')
+         }
+         model_name <- "Kannisto (1992): u(x) = a*exp(b*x) / [1 + a*exp(b*x)]"
+         parS_default <- c(a = 0.5, b = 0.13)
+         parS <- if (is.null(parS)) parS_default else parS 
+         if (is.null(names(parS))) names(parS) <- letters[1:length(parS)]
+         # Model ------------------------------------------
+         fun_ux <- Fun_ux('kannisto')
+         # Find parameters / Optimization -----------------
+         fun_resid <- function(par, x, ux) {
+           sum(ux*log(fun_ux(par, x)) - fun_ux(par, x), na.rm = TRUE)
+         }
+         for (i in 1:nrow(pars)) {
+           opt_i <- optim(par = parS, fn = fun_resid, x = x_scaled,
+                          ux = mx[, i], method = 'L-BFGS-B',
+                          lower = 1e-15, control = list(fnscale = -1))
+           pars[i, ] <- opt_i$par
+         }
+         # Compute death rates ---------------------------
+         for (i in 1:nrow(pars)) fitted.values[, i] = fun_ux(pars[i, ], x_scaled)
+         residuals <- mx - fitted.values
+         
+         # Retun results ----------------------------------
+         out <- structure(class = 'Kannisto', 
+                          list(x = x, mx.input = mx, fitted.values = fitted.values,
+                               residuals = residuals, model_name = model_name, 
+                               coefficients = pars))
+         #out$call <- match.call(definition = Kannisto)
+         return(out)
+       })
+}
+
+predict.Kannisto <- function(object, newdata=NULL, ...) {
+  if (is.null(newdata)) { pred.values <- fitted(object)
+  }else{
+    x <- newdata
+    x_scaled <- x - min(object$x) 
+    pars <- coef(object)
+    pred.values <- matrix(NA, nrow = length(x), ncol = nrow(pars))
+    dimnames(pred.values) <- list(x, rownames(pars))
+    fun_ux <- Fun_ux('kannisto')
+    for (i in 1:nrow(pars)) {pred.values[,i] = fun_ux(pars[i,], x_scaled)}
+  }
+  return(pred.values)
+}
+
 
 my_reshape.function <- function(i=names(x)[1],DecompIn=x){
   
@@ -90,24 +181,31 @@ AKm02a0 <- function(m0, sex = "m"){
 }
 
 LifeTable <- function(mx,sex = "f"){
+  x         <- 0:109
   i.openage <- length(mx)
   OPENAGE   <- i.openage - 1
   RADIX     <- 1
+  if (mx[i.openage] < 0.5 | is.na(mx[i.openage])) mx[i.openage] = mx[i.openage - 1]*1.1 
   ax        <- mx * 0 + .5
   ax[1]     <- AKm02a0(m0 = mx[1], sex = sex)
+  ax[i.openage] <- if (mx[i.openage] == 0) 0.5 else 1/mx[i.openage]
+  
   qx        <- mx / (1 + (1 - ax) * mx)
   qx[i.openage]       <- ifelse(is.na(qx[i.openage]), NA, 1)
-  ax[i.openage]       <- 1 / mx[i.openage]
-  if (ax[i.openage]==Inf){ax[i.openage] <- .5}
+  #qx[x >= 95 & mx == 0] <- 1
+  
   px 				    <- 1 - qx
   px[is.nan(px)]      <- 0
   lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
   dx 				    <- lx * qx
-  dx[i.openage] <-0
+  #dx[i.openage] <-0
   Lx 				    <- lx - (1 - ax) * dx
-  Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
+  Lx[i.openage ]	    <- dx[i.openage ] * ax[i.openage ]
+  Lx[is.na(Lx)] <- 0
   Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
   ex 				    <- Tx / lx
+  ex[is.na(ex)] <- 0
+  ex[i.openage] <- if (ex[OPENAGE] == 0) 0 else ax[i.openage]
   
   v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
   v[length(ex)] <- ex[length(ex)]
@@ -130,21 +228,27 @@ LifeExpectancy <- compiler::cmpfun(function(mx,sex = "f"){
   i.openage <- length(mx)
   OPENAGE   <- i.openage - 1
   RADIX     <- 1
+  if (mx[i.openage] < 0.5 | is.na(mx[i.openage])) mx[i.openage] = mx[i.openage - 1]*1.1 
   ax        <- mx * 0 + .5
   ax[1]     <- AKm02a0(m0 = mx[1], sex = sex)
+  ax[i.openage] <- if (mx[i.openage] == 0) 0.5 else 1/mx[i.openage]
+  
   qx        <- mx / (1 + (1 - ax) * mx)
   qx[i.openage]       <- ifelse(is.na(qx[i.openage]), NA, 1)
-  ax[i.openage]       <- 1 / mx[i.openage]
-  if (ax[i.openage]==Inf){ax[i.openage] <- .5}
+  
+  
   px 				    <- 1 - qx
   px[is.nan(px)]      <- 0
   lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
   dx 				    <- lx * qx
-  dx[i.openage] <-0
+  #dx[i.openage] <-0
   Lx 				    <- lx - (1 - ax) * dx
-  Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
+  Lx[i.openage ]	    <- dx[i.openage ] * ax[i.openage ]
+  Lx[is.na(Lx)] <- 0
   Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
   ex 				    <- Tx / lx
+  ex[is.na(ex)] <- 0
+  ex[i.openage] <- if (ex[OPENAGE] == 0) 0 else ax[i.openage]
   ex[1]
 })
 
@@ -153,21 +257,27 @@ edagger.frommx <- function(mx,sex){
   i.openage <- length(mx)
   OPENAGE   <- i.openage - 1
   RADIX     <- 1
+  if (mx[i.openage] < 0.5 | is.na(mx[i.openage])) mx[i.openage] = mx[i.openage - 1]*1.1 
   ax        <- mx * 0 + .5
   ax[1]     <- AKm02a0(m0 = mx[1], sex = sex)
+  ax[i.openage] <- if (mx[i.openage] == 0) 0.5 else 1/mx[i.openage]
+  
   qx        <- mx / (1 + (1 - ax) * mx)
   qx[i.openage]       <- ifelse(is.na(qx[i.openage]), NA, 1)
-  ax[i.openage]       <- 1 / mx[i.openage]
-  if (ax[i.openage]==Inf){ax[i.openage] <- .5}
+  
+  
   px 				    <- 1 - qx
   px[is.nan(px)]      <- 0
   lx 			        <- c(RADIX, RADIX * cumprod(px[1:OPENAGE]))
   dx 				    <- lx * qx
-  dx[i.openage] <-0
+  #dx[i.openage] <-0
   Lx 				    <- lx - (1 - ax) * dx
-  Lx[i.openage ]	    <- lx[i.openage ] * ax[i.openage ]
+  Lx[i.openage ]	    <- dx[i.openage ] * ax[i.openage ]
+  Lx[is.na(Lx)] <- 0
   Tx 				    <- c(rev(cumsum(rev(Lx[1:OPENAGE]))),0) + Lx[i.openage]
   ex 				    <- Tx / lx
+  ex[is.na(ex)] <- 0
+  ex[i.openage] <- if (ex[OPENAGE] == 0) 0 else ax[i.openage]
   
   v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
   v[length(ex)] <- ex[length(ex)]
