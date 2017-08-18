@@ -11,6 +11,36 @@ rsconnect::setAccountInfo(name='jmaburto',
                           token='7310E08D0D081D3C3CABCAA90D18045E',
                           secret='Vzlie6RN39/THGhWKatGf/C68yZp+RENdTdOl/ey')
 
+state.ind   <- 'National'
+initial.ind <- 2000
+final.ind   <- 2010
+Data        <- Data.ex
+
+Data.fig   <- Data[Data$year >= initial.ind & Data$year < final.ind & Data$Name == state.ind, ]
+Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
+#Data.fig        <- Data.fig[Data.fig$Age!= '0-4',]
+
+Total.Age <- Data.fig[,sum(Contribution), by = list(Age,Sex)]
+Total.Age$V1 <- round(Total.Age$V1,2)
+
+base2 <- c(rev(brewer.pal(8,name = 'Spectral'))[1:5],rev(brewer.pal(8,name = 'Spectral'))[8],rev(brewer.pal(8,name = 'Spectral'))[7],'lightgrey')
+Data.fig$Contribution <- round(Data.fig$Contribution,2)
+p <- ggplot(Data.fig[Data.fig$Sex=='Males'], aes(x = Age, y = Contribution, fill = Cause)) +
+  ggtitle('Decomposition of life expectancy (years)', subtitle = paste0(state.ind,', ', initial.ind,'-',final.ind))+
+  #facet_wrap(~Sex)+
+  scale_fill_manual('Cause of death', values = base2) + 
+  geom_bar(stat = "identity",position = "stack")+
+  theme_light()+
+  theme(text = element_text(size=16),
+        axis.text.x = element_text(angle=45, hjust=1))+
+  labs(x = " ", y = " ",size=16)+
+  theme(text = element_text(size=15),
+        strip.text.x = element_text(size = 16, colour = "black"))+
+  geom_hline(yintercept = 0)
+p
+pdf(file="Cause_e0_decomp_Males.pdf",width=8,height=5,pointsize=6,useDingbats = F)
+print(p)
+dev.off()
 
  # source('C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation/R/2_3_Reshape_Results.R')
  # 
