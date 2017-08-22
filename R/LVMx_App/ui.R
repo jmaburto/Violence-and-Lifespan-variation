@@ -19,7 +19,7 @@ library(plotly)
     fluidPage(
       titlePanel('Lifespan variation in Mexico, 1995-2015'),
       navbarPage(
-        'Aburto JM, Beltran-Sanchez J and Valdivia M. "The impact of violence on lifespan variation in Mexico and 
+        'Aburto JM & Beltran-Sanchez H. "The impact of violence on lifespan variation in Mexico and 
         its states, 1995-2015". Max Planck Center on the Biodemography of Aging, 2017',
         position = c("fixed-bottom")),
       
@@ -27,7 +27,7 @@ library(plotly)
         sidebarPanel(
           selectInput( 'state.ind','State',states, selected = 'National'),
           br(),
-          selectInput( 'initial.ind','Initial year',Initial.year, selected = 1995),
+          selectInput( 'initial.ind','Initial year',Initial.year, selected = 2000),
           br(),
           uiOutput('vx'),
           br(),

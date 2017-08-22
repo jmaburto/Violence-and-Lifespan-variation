@@ -54,7 +54,7 @@ shinyServer(
     var1 <- reactive(seq(as.integer(input$initial.ind)+1,2015,1))
 
     output$vx <- renderUI({
-      selectInput('final.ind','Final year',choices = var1())
+      selectInput('final.ind','Final year',choices = var1(),selected = 2010)
     })
     
     output$dx.plot <- renderPlotly({

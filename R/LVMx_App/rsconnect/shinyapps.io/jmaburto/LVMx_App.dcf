@@ -3,9 +3,9 @@ title: LVMx_App
 account: jmaburto
 server: shinyapps.io
 appId: 198310
-bundleId: 913793
+bundleId: 948276
 url: https://jmaburto.shinyapps.io/LVMx_App/
-when: 1500897174.12417
+when: 1503315922.22071
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: Decomp_Shiny_app.R
