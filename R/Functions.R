@@ -1,3 +1,71 @@
+#fuction to subset objects with less categories, useful for summary tables at the national level
+
+get.data.function2 <-  function(Data2 = DT.Decomp.ex,initial = initial.ind,final = final.ind){
+  Data <- cbind(Data2[,1:6], AMS = rowSums(Data2[,c(7,10,8,9,12)]), Diabetes = Data2[,c(11)], IHD = Data2[,c(13)],
+                LungCancer = Data2[,c(16)], Cirrhosis = Data2[,c(17)],Homicide = Data2[,c(18)],TAcc = Data2[,c(19)],
+                Rest = rowSums(Data2[,c(14,21,15,20)]))
+  
+  colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
+  Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
+                               'Homicide','Traffic accidents','Rest')
+  Data.melt <- Data.melt[Data.melt$age1 < 100,]
+  Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
+                             '40-44','45-49','50-54','55-59','60-64','65-69',
+                             "70-74","75-79","80-84","85-89","90-94","95+")
+  Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,95,5),Inf),labels=Labels.age))
+  Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
+  
+  Data.fig   <- Data.melt5[Data.melt5$year >= initial & Data.melt5$year < final, ]
+  Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
+  Data.fig
+}
+
+getData.function.g <- function(Data2 = DT.Decomp.ex,state = state.ind,initial = initial.ind,final = final.ind){
+  Data <- cbind(Data2[,1:6], AMS = rowSums(Data2[,c(7,10,8,9,12)]), Diabetes = Data2[,c(11)], IHD = Data2[,c(13)],
+                LungCancer = Data2[,c(16)], Cirrhosis = Data2[,c(17)],Homicide = Data2[,c(18)],TAcc = Data2[,c(19)],
+                Rest = rowSums(Data2[,c(14,21,15,20)]))
+  
+  colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
+  Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
+                               'Homicide','Traffic accidents','Rest')
+  Data.melt <- Data.melt[Data.melt$age1 < 100,]
+  Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
+                             '40-44','45-49','50-54','55-59','60-64','65-69',
+                             "70-74","75-79","80-84","85-89","90-94","95+")
+  Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,95,5),Inf),labels=Labels.age))
+  Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
+  
+  Data.fig   <- Data.melt5[Data.melt5$year >= initial & Data.melt5$year < final, ]
+  Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
+  Data.fig   <- Data.fig[Data.fig$Name == state,]
+  Data.fig$Contribution <- round(Data.fig$Contribution,2)
+  Data.fig
+}
+
+#fuction to subset objects with more categories, useful for summary tables at the national level
+
+getData.function <- function(Data = DT.Decomp.ex,state = state.ind,initial = initial.ind,final = final.ind){
+  
+  colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:14,16)
+  Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  levels(Data.melt$Cause) <- c('Infect & respiratory','Cancers','Circulatory','Birth conditions',
+                               'Diabetes','Other AMS','IHD','HIV','Suicide','Lung Cancer','Cirrhosis',
+                               'Homicide','Traffic accidents','Other HD', 'Rest')
+  Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
+                             '40-44','45-49','50-54','55-59','60-64','65-69',
+                             "70-74","75-79","80-84","85-89","90-94","95-99","100-104","105+")
+  Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,105,5),Inf),labels=Labels.age))
+  Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
+  
+  Data.fig   <- Data.melt5[Data.melt5$year >= initial & Data.melt5$year < final, ]
+  Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)]
+  Data.fig   <- Data.fig[Data.fig$Name == state,]
+  Data.fig$Contribution <- round(Data.fig$Contribution,2)
+  Data.fig
+}
+
 my.kannisto.fun <- function(mx = mx, x=80:94){
   mx2 <- mx
   fit_kan    <- Kannisto(mx=mx[x+1],x=x)

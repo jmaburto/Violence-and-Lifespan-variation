@@ -16,8 +16,8 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 #### REST: 14+21+15+20
 
 
-load('R/LVMx_App/Shinny_data.RData')
-#source('R/2_3_Reshape_Results.R')
+#load('R/LVMx_App/Shinny_data.RData')
+source('R/2_3_Reshape_Results.R')
 
 library(ggthemes)
 library(ggplot2)
@@ -32,13 +32,11 @@ library(reshape2)
 #devtools::install_github('hadley/ggplot2')
 #devtools::install_github("ropensci/plotly")
 
-unique(DT.Decomp.ex$year)
-
 state.ind   <- 'National'
-initial.ind <- 2000
-final.ind   <- 2010
-Data        <- DT.Decomp.ex
-Data2        <- DT.Decomp.ex
+initial.ind <- 1995
+final.ind   <- 2005
+#Data        <- DT.Decomp.ex
+#Data2        <- DT.Decomp.ex
 
 getData.function <- function(Data = DT.Decomp.ex,state = state.ind,initial = initial.ind,final = final.ind){
   
@@ -106,8 +104,8 @@ p <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
   theme(axis.title.x = element_text(size = 12, angle = 00))+
   theme(text = element_text(size=14),
         strip.text.x = element_text(size = 14, colour = "black"))+
-  geom_hline(yintercept = 0)
-#  coord_flip()
+  geom_hline(yintercept = 0)+
+ coord_flip()
 p
 
 ggplotly(p,width = 1100, height = 500)
@@ -140,6 +138,7 @@ ggplotly(q)
 q <- ggplotly(q)
 
 
+#life expectancy at birth and lifespan variation at birth for males at the national level
 
 
 # #plot(1:7,1:7,col=toupper(base2),pch=16,cex=5)
