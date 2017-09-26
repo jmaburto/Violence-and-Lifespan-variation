@@ -190,7 +190,7 @@ COD.state.ex$Name <- reorder(COD.state.ex$Name,COD.state.ex$Ref.order)
 
 
 unique(COD.state.ex$Cause)
-COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,5,6)], ]
+COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,3,5,6,7)], ]
 
 changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in '~(e[0])), subtitle =bquote('Negative values decrease '~(e[0])~' and positive values increase '~(e[0])) )+
@@ -320,7 +320,7 @@ COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
 
 ######
 unique(COD.state.ed$Cause)
-COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,5,6)], ]
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,3,5,6)], ]
 
 changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
@@ -394,6 +394,30 @@ COD.state.ed$Ref.order <- c(ref.order$ref.order,ref.order$ref.order)
 COD.state.ed$Region <- factor(COD.state.ed$Region,levels = rev(levels(COD.state.ed$Region)))
 
 COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
+
+### for the appendix
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,3,5,6)], ]
+
+changes.COD.females.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
+  geom_vline(xintercept = 0)+
+  xlim(c(-1.25,1))+
+  geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
+  facet_grid(Region ~ Cause, scales = "free", space = "free") +
+  theme_light()+
+  scale_color_manual(values=base2[c(1,6)])+
+  theme(axis.title.y=element_blank())+
+  theme(axis.title.x = element_text(size = 12, angle = 00))+
+  theme(text = element_text(size=14),
+        strip.text.x = element_text(size = 14, colour = "black"))+
+  theme(strip.text.y = element_text(colour = "black"))+
+  theme(legend.position = 'bottom')
+
+changes.COD.females.ed
+
+pdf(file="R/Figures/COD_ed_males.pdf",width=13,height=7.5,useDingbats = F)
+print(changes.COD.males.ed)
+dev.off()
 
 ### for the appendix
 
