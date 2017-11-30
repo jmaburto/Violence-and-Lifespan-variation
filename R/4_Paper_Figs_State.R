@@ -190,7 +190,7 @@ COD.state.ex$Name <- reorder(COD.state.ex$Name,COD.state.ex$Ref.order)
 
 
 unique(COD.state.ex$Cause)
-COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,3,5,6,7)], ]
+COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,6,7)], ]
 
 changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in '~(e[0])), subtitle =bquote('Negative values decrease '~(e[0])~' and positive values increase '~(e[0])) )+
@@ -320,7 +320,7 @@ COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
 
 ######
 unique(COD.state.ed$Cause)
-COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,3,5,6)], ]
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,6,7)], ]
 
 changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
