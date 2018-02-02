@@ -26,4 +26,3 @@ DT.LTmx          <- DT.mxCOD[,list(age=LifeTable.DT(.SD)[,1],lx = LifeTable.DT(.
                                   e.dagger = LifeTable.DT(.SD)[,5]), by = list(year,sex,state)]
 
 
-save(DT.mxCOD,file = 'Data/Mex_mx_Anthony.RData')

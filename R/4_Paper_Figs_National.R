@@ -68,7 +68,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference in life expectancy ='~ .(dife0) ) )+
   ylim(-.18, .9)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -123,7 +123,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference in life expectancy ='~ .(dife0) ) )+
   ylim(-.18, .9)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -178,7 +178,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e^"\u2020" ==.(dife0) ) )+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   ylim(-.7, .12)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -234,7 +234,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e^"\u2020" == .(dife0) ) )+
   ylim(-.7, .12)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+

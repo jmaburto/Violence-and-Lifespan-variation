@@ -26,6 +26,7 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 
 # These data comes from INEGI data micro files
 load('Data/Counts&Rates_1990-2015Mex.RData')
+Data_Counts[Data_Counts$year == 2015,]
 Data_Counts <- Data_Counts[Data_Counts$year > 1994 & Data_Counts$year < 2016,]
 
 # Get total for the country
