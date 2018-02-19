@@ -11,7 +11,7 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 #### Note: these data do not contain Not Specified categories
 # devtools::install_github('hadley/ggplot2')
 
-load('R/LVMx_App/Shinny_data.RData')
+#load('R/LVMx_App/Shinny_data.RData')
 #source('R/2_3_Reshape_Results.R')
 library(ggthemes)
 library(ggplot2)

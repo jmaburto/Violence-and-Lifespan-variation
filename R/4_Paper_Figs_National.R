@@ -31,9 +31,8 @@ source('R/Functions.R')
 base2 <- c(1:15)
 base2 <- c(rev(brewer.pal(8,name = 'Spectral'))[1:5],rev(brewer.pal(8,name = 'Spectral'))[8],rev(brewer.pal(8,name = 'Spectral'))[7],'lightgrey')
 
-# Figures for life expectancy at birth ------------------------------------
 
-
+# Figures for life expectancy at age 15 ------------------------------------
 #First with 1995-2005
 State   <- 'National'
 Initial <- 1995
@@ -44,9 +43,12 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ex,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Males']$ex[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Males']$ex[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Males']$ex[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Males']$ex[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -68,12 +70,12 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference in life expectancy ='~ .(dife0) ) )+
-  ylim(-.18, .9)+
+  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e(15)[.(Initial)] == .(e01)~',' ~ e(15)[.(Final)] == .(e02) ~'. Difference in life expectancy at age 15='~ .(dife0) ) )+
+  ylim(-.15, .35)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
   theme_light()+
-  geom_label(aes(Age, -.17, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
+  geom_label(aes(Age, -.12, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
   theme(text = element_text(size=12),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(x = "Age group", y = "Contribution (years)",size=12)+
@@ -81,12 +83,11 @@ ex.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
   theme(axis.title.x = element_text(size = 12, angle = 00))+
   theme(text = element_text(size=14),
         strip.text.x = element_text(size = 14, colour = "black"))+
-  theme(legend.position = c(.75,.75))+
+  theme(legend.position = c(.8035,.22))+
   annotate("text", x=-Inf, y=-Inf,hjust=1,vjust=1, label= text.1,size=6) + 
   geom_hline(yintercept = 0)+coord_flip()
 
 ex.males1
-
 
 
 #Now 2005-2015
@@ -99,9 +100,12 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ex,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Males']$ex[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Males']$ex[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Males']$ex[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Males']$ex[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -123,12 +127,12 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference in life expectancy ='~ .(dife0) ) )+
-  ylim(-.18, .9)+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e(15)[.(Initial)] == .(e01)~',' ~ e(15)[.(Final)] == .(e02) ~'. Difference in life expectancy at age 15 ='~ .(dife0) ) )+
+  ylim(-.15, .35)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
   theme_light()+
-  geom_label(aes(Age, -.175, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
+  geom_label(aes(Age, -.12, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
   theme(text = element_text(size=12),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(x = "Age group", y = "Contribution (years)",size=12)+
@@ -136,11 +140,18 @@ ex.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
   theme(axis.title.x = element_text(size = 12, angle = 00))+
   theme(text = element_text(size=14),
         strip.text.x = element_text(size = 14, colour = "black"))+
-  theme(legend.position = c(.75,.75))+
+  theme(legend.position = c(.8035,.22))+
   annotate("text", x=-Inf, y=-Inf,hjust=1,vjust=1, label= text.1,size=6) + 
   geom_hline(yintercept = 0)+coord_flip()
 
 ex.males2
+
+
+require(gridExtra)
+pdf(file="R/Figures/ex_males.pdf",width=16,height=7,useDingbats = F)
+grid.arrange(ex.males1,ex.males2,ncol=2)
+dev.off()
+
 
 
 # Figures for lifespan variation at birth ------------------------------------
@@ -155,9 +166,12 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ed,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial& DT.LTmx$sex == 'Males']$e.dagger[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Males']$e.dagger[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial& DT.LTmx$sex == 'Males']$e.dagger[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Males']$e.dagger[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -178,12 +192,12 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e^"\u2020" ==.(dife0) ) )+
+  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e(15)[.(Initial)]^"\u2020" == .(e01)~',' ~ e(15)[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e(15)^"\u2020"  ==.(dife0) ) )+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
-  ylim(-.7, .12)+
+  ylim(-.15, .35)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
   theme_light()+
-  geom_label(aes(Age, -.7, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
+  geom_label(aes(Age, -.12, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
   theme(text = element_text(size=12),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(x = "Age group", y = "Contribution (years)",size=12)+
@@ -191,7 +205,7 @@ ed.males1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
   theme(axis.title.x = element_text(size = 12, angle = 00))+
   theme(text = element_text(size=14),
         strip.text.x = element_text(size = 14, colour = "black"))+
-  theme(legend.position = c(.35,.75))+
+  theme(legend.position = c(.8035,.22))+
   annotate("text", x=-Inf, y=-Inf,hjust=1,vjust=1, label= text.1,size=6) + 
   geom_hline(yintercept = 0)+coord_flip()
   #scale_x_discrete(position = "top") 
@@ -210,9 +224,12 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ed,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial& DT.LTmx$sex == 'Males']$e.dagger[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Males']$e.dagger[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial& DT.LTmx$sex == 'Males']$e.dagger[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Males']$e.dagger[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -234,12 +251,12 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e^"\u2020" == .(dife0) ) )+
-  ylim(-.7, .12)+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e(15)[.(Initial)]^"\u2020" == .(e01)~',' ~ e(15)[.(Final)]^"\u2020" == .(e02) ~'. Difference in'~ e(15)^"\u2020" == .(dife0) ) )+
+  ylim(-.15, .35)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
   theme_light()+
-  geom_label(aes(Age, -.7, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
+  geom_label(aes(Age, -.12, label = Contribution,fill=NULL),size=3,show.legend = FALSE, data = Total.Age)+
   theme(text = element_text(size=12),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(x = "Age group", y = "Contribution (years)",size=12)+
@@ -247,18 +264,12 @@ ed.males2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
   theme(axis.title.x = element_text(size = 12, angle = 00))+
   theme(text = element_text(size=14),
         strip.text.x = element_text(size = 14, colour = "black"))+
-  theme(legend.position = c(.35,.75))+
+  theme(legend.position = c(.8035,.22))+
   annotate("text", x=-Inf, y=-Inf,hjust=1,vjust=1, label= text.1,size=6) + 
   geom_hline(yintercept = 0)+coord_flip()
   #scale_x_discrete(position = "top") 
 
 ed.males2
-
-
-require(gridExtra)
-pdf(file="R/Figures/ex_males.pdf",width=16,height=7,useDingbats = F)
-grid.arrange(ex.males1,ex.males2,ncol=2)
-dev.off()
 
 
 
@@ -284,9 +295,13 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ex,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$ex[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Females']$ex[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$ex[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final& DT.LTmx$sex == 'Females']$ex[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -308,7 +323,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.females1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('A ', Initial,'-',Final), subtitle = bquote(e(15)[.(Initial)] == .(e01)~',' ~ e(15)[.(Final)] == .(e02) ~'. Difference in life expectancy at age 15='~ .(dife0) ) )+
   ylim(-.18, .9)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -339,9 +354,13 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ex,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$ex[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Females']$ex[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$ex[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final & DT.LTmx$sex == 'Females']$ex[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -363,7 +382,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ex.females2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e[.(Initial)] == .(e01)~',' ~ e[.(Final)] == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote(e(15)[.(Initial)] == .(e01)~',' ~ e(15)[.(Final)] == .(e02) ~'. Difference ='~ .(dife0) ) )+
   ylim(-.18, .9)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -395,9 +414,12 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ed,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$e.dagger[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final &  DT.LTmx$sex == 'Females']$e.dagger[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial & DT.LTmx$sex == 'Females']$e.dagger[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final &  DT.LTmx$sex == 'Females']$e.dagger[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -418,7 +440,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.females1 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('A ',Initial,'-',Final), subtitle = bquote( e(15)[.(Initial)]^"\u2020" == .(e01)~',' ~ e(15)[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   ylim(-.7, .12)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+
@@ -450,9 +472,13 @@ Data.fig        <- getData.function.g(Data2 = DT.Decomp.ed,state = State,initial
 Data.fig$Period <- paste0(Initial,'-',Final)
 Data.fig        <- Data.fig[Data.fig$Sex == sex,]
 
+
+age.labels <-unique(Data.fig$Age)
+Data.fig        <- Data.fig[Data.fig$Age %in% age.labels[4:20],]
+
 # Get life expectancies
-e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial &  DT.LTmx$sex == 'Females']$e.dagger[1],2)
-e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final &  DT.LTmx$sex == 'Females']$e.dagger[1],2)
+e01     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Initial &  DT.LTmx$sex == 'Females']$e.dagger[16],2)
+e02     <- round(DT.LTmx[DT.LTmx$state.name == State & DT.LTmx$year ==  Final &  DT.LTmx$sex == 'Females']$e.dagger[16],2)
 dife0   <- e02-e01
 
 Total.cause <- Data.fig[,list(Contribution = sum(Contribution)), by = list(Cause)]
@@ -474,7 +500,7 @@ text.1 <- paste('Numbers in boxes are age-specific contributions')
 
 
 ed.females2 <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e[.(Initial)]^"\u2020" == .(e01)~',' ~ e[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
+  ggtitle(paste0('B ',Initial,'-',Final), subtitle = bquote( e(15)[.(Initial)]^"\u2020" == .(e01)~',' ~ e(15)[.(Final)]^"\u2020" == .(e02) ~'. Difference ='~ .(dife0) ) )+
   ylim(-.7, .12)+
   scale_fill_manual(name= ' Cause of death (Contribution)',values=base2,labels = cause.lab)+
   geom_bar(aes(group = Cause), stat = "identity",position = "stack")+

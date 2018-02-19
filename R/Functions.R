@@ -278,7 +278,7 @@ LifeTable <- function(mx,sex = "f"){
   v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
   v[length(ex)] <- ex[length(ex)]
   v <- dx*v
-  e.dagger <- rev(cumsum(v))/lx
+  e.dagger <- rev(cumsum(rev(v)))/lx
   Lifetable       <- cbind(age=0:109,lx=lx,dx=dx,ex=ex,e.dagger=e.dagger)
   return(Lifetable)
   #list(e0=ex[1,],ex=ex,lx=lx,mx=mx)
@@ -317,7 +317,7 @@ LifeExpectancy <- compiler::cmpfun(function(mx,sex = "f"){
   ex 				    <- Tx / lx
   ex[is.na(ex)] <- 0
   ex[i.openage] <- if (ex[OPENAGE] == 0) 0 else ax[i.openage]
-  ex[1]
+  ex[16]
 })
 
 
@@ -350,8 +350,8 @@ edagger.frommx <- function(mx,sex){
   v        <- (ax*c(ex[-1L],0) + (1-ax)*ex)
   v[length(ex)] <- ex[length(ex)]
   v <- dx*v
-  e.dagger <- rev(cumsum(v))/lx
-  e.dagger[1]
+  e.dagger <- rev(cumsum(rev(v)))/lx
+  e.dagger[16]
 }
 
 e0frommxc <- function(mxcvec,sex){

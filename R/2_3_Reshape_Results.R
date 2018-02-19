@@ -16,8 +16,8 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 
 source('R/2_1_LifeExpectancy&LifeDisparity.R')
 source('R/Functions.R')
-Decomp.ex <- local(get(load("Data/DecompResults_ex_List.RData")))
-Decomp.ed <- local(get(load("Data/DecompResults_ed_List.RData")))
+Decomp.ex <- local(get(load("Data/DecompResults_ex_List_15.RData")))
+Decomp.ed <- local(get(load("Data/DecompResults_ed_List_15.RData")))
 
 
 #get results for decomp in ex un a data.table

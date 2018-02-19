@@ -22,7 +22,8 @@ library(data.table)
 library(reshape2)
 
 
-#load('R/LVMx_App/Shinny_data.RData')
+
+
 source('R/2_3_Reshape_Results.R')
 source('R/Functions.R')
 
@@ -35,7 +36,7 @@ base2 <- c(rev(brewer.pal(8,name = 'Spectral'))[1:5],rev(brewer.pal(8,name = 'Sp
 # Changes in life expectancy by period for males ------------------------------------
 final.y <- 2015
 Sex     <- 'Males'
-Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 0 & DT.LTmx$state.name!= 'National',]
+Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 15 & DT.LTmx$state.name!= 'National',]
 Changes.data   <- Changes.data[order(state, sex, year),]
 Dif.data.state <- Changes.data[, list(Difference=diff(ex)), by = list(state.name,region,sex,state)]
 Dif.data.state$Difference.ed <- Changes.data[, list(Difference.ed=diff(e.dagger)), by = list(state.name,region,sex,state)]$Difference.ed
@@ -50,7 +51,7 @@ head(Dif.data.state)
 Dif.data.state$state.name <- reorder(Dif.data.state$state.name,Dif.data.state$Ref.order)
 
 changes.ex.males <- ggplot(Dif.data.state, aes(Difference, state.name)) +
-  ggtitle(bquote('A Changes in state male life expectancy '~(e[0])), subtitle = 'by period')+
+  ggtitle(bquote('A Changes in state male life expectancy '~(e[15])), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -67,7 +68,7 @@ changes.ex.males
 
 
 changes.ed.males <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
-  ggtitle(bquote('B Changes in state male lifespan variation '~(e^"\u2020")), subtitle = 'by period')+
+  ggtitle(bquote('B Changes in state male lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference.ed, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -100,7 +101,7 @@ dev.off()
 # Changes in life expectancy by period for females------------------------------------
 final.y <- 2015
 Sex     <- 'Females'
-Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 0 & DT.LTmx$state.name!= 'National',]
+Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 15 & DT.LTmx$state.name!= 'National',]
 Changes.data   <- Changes.data[order(state, sex, year),]
 Dif.data.state <- Changes.data[, list(Difference=diff(ex)), by = list(state.name,region,sex,state)]
 Dif.data.state$Difference.ed <- Changes.data[, list(Difference.ed=diff(e.dagger)), by = list(state.name,region,sex,state)]$Difference.ed
@@ -115,7 +116,7 @@ head(Dif.data.state)
 Dif.data.state$state.name <- reorder(Dif.data.state$state.name,Dif.data.state$Ref.order)
 
 changes.ex.females <- ggplot(Dif.data.state, aes(Difference, state.name)) +
-  ggtitle(bquote('A Changes in state male life expectancy '~(e[0])), subtitle = 'by period')+
+  ggtitle(bquote('A Changes in state female life expectancy '~(e[15])), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -132,7 +133,7 @@ changes.ex.females
 
 
 changes.ed.females <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
-  ggtitle(bquote('B Changes in state male lifespan variation '~(e^"\u2020")), subtitle = 'by period')+
+  ggtitle(bquote('B Changes in state female lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference.ed, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -193,7 +194,7 @@ unique(COD.state.ex$Cause)
 COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,6,7)], ]
 
 changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e[0])), subtitle =bquote('Negative values decrease '~(e[0])~' and positive values increase '~(e[0])) )+
+  ggtitle(bquote('Cause-specific contributions to the change in life expectancy at age 15'~(e[15])), subtitle =bquote('Negative values decrease '~e[15]~' and positive values increase '~e[15]) )+
   geom_vline(xintercept = 0)+
   xlim(c(-2,2))+
   geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -217,7 +218,7 @@ dev.off()
 
 
 changes.COD.males.ex2 <- ggplot(COD.state.ex, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e[0])), subtitle =bquote('Negative values decrease '~(e[0])~' and positive values increase '~(e[0])) )+
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e[15])), subtitle =bquote('Negative values decrease '~e[15]~' and positive values increase '~e[15]) )+
   geom_vline(xintercept = 0)+
   xlim(c(-2,2))+
   geom_point(data = COD.state.ex, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -269,7 +270,7 @@ COD.state.ex$Name <- reorder(COD.state.ex$Name,COD.state.ex$Ref.order)
 
 
 changes.COD.females.ex2 <- ggplot(COD.state.ex, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e[0])), subtitle =bquote('Negative values decrease '~(e[0])~' and positive values increase '~(e[0])) )+
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e[15])), subtitle =bquote('Negative values decrease '~e[15]~' and positive values increase '~e[15]) )+
   geom_vline(xintercept = 0)+
   xlim(c(-2,2))+
   geom_point(data = COD.state.ex, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -323,7 +324,7 @@ unique(COD.state.ed$Cause)
 COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,6,7)], ]
 
 changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
+  ggtitle(bquote('Cause-specific contributions to the change in lifespan variation at age 15 '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
   xlim(c(-1.25,1))+
   geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -347,7 +348,7 @@ dev.off()
 
 
 changes.COD.males.ed2 <- ggplot(COD.state.ed, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
   xlim(c(-1.25,1))+
   geom_point(data = COD.state.ed, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -399,7 +400,7 @@ COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
 COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,3,5,6)], ]
 
 changes.COD.females.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
   xlim(c(-1.25,1))+
   geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -423,7 +424,7 @@ dev.off()
 
 
 changes.COD.females.ed2 <- ggplot(COD.state.ed, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~(e^"\u2020")~' and positive values increase '~(e^"\u2020")) )+
+  ggtitle(bquote('Cause-specific contributions to the change in '~(e^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
   xlim(c(-1.25,1))+
   geom_point(data = COD.state.ed, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
@@ -442,5 +443,7 @@ changes.COD.females.ed2
 pdf(file="R/Figures/COD_ed_females_appendix.pdf",width=18,height=9,useDingbats = F)
 print(changes.COD.females.ed2)
 dev.off()
+
+#load('R/LVMx_App/Shinny_data.RData')
 
 

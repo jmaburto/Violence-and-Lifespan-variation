@@ -14,7 +14,7 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 #### 14. other heart diseases, 15. Ill-defined causes, 16. All other Non-AM
 #### Note: these data do not contain Not Specified categories
 
-source('R/2_1_LifeExpectancy&LifeDisparity.R')
+#source('R/2_1_LifeExpectancy&LifeDisparity.R')
 source('R/Functions.R')
 # Get total for the country
 #mx <- DT.mxCOD[year==1995 & sex == 1 & state==0,]$mx
@@ -101,7 +101,7 @@ for (i in sexes){
   Decomp.results.list[[as.character(i)]]  <- state.list
 }
 )
-save(Decomp.results.list, file =  'Data/DecompResults_ex_List.RData')
+save(Decomp.results.list, file =  'Data/DecompResults_ex_List_15.RData')
 gc()
 # bruger   system forløbet 
 # 44.07    60.37  6009.63 
@@ -136,5 +136,5 @@ system.time(
     Decomp.results.edagger[[as.character(i)]]  <- state.list
   }
 )
-save(Decomp.results.edagger, file =  'Data/DecompResults_ed_List.RData')
+save(Decomp.results.edagger, file =  'Data/DecompResults_ed_List_15.RData')
 gc()
