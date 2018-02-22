@@ -3,9 +3,9 @@ title: LV_in_Mexico
 account: demographs
 server: shinyapps.io
 appId: 280536
-bundleId: 1221162
+bundleId: 1233499
 url: https://demographs.shinyapps.io/lv_in_mexico/
-when: 1518536300.36729
+when: 1519225137.65314
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: Decomp_Shiny_app.R
