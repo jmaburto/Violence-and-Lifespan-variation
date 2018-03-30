@@ -2,8 +2,6 @@ library(shiny)
 library(ggplot2)
 library(data.table)
 library(RColorBrewer)
-
-
 setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation/R/LVMx_15_App/")
 
 

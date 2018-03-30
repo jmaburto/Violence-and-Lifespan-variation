@@ -20,7 +20,7 @@ library(plotly)
       titlePanel('Lifespan variation in Mexico, 1995-2015'),
       navbarPage(
         'Aburto JM & Beltran-Sanchez H. "The impact of violence on lifespan variation in Mexico and 
-        its states, 1995-2015". Biodemography Unit, Institue of Public Health, University of Southern Denmark.',
+        its states, 1995-2015". Biodemography Unit, Institute of Public Health, University of Southern Denmark.',
         position = c("fixed-bottom")),
       
       sidebarLayout(

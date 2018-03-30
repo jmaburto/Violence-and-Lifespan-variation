@@ -7,37 +7,11 @@ library(RColorBrewer)
 load('Shinny_data.RData')
 
 
-# getData.function.g <- function(Data2,state ,initial,final){
-#   Data <- cbind(Data2[,1:6], AMS = rowSums(Data2[,c(7,10,8,9,12)]), Diabetes = Data2[,c(11)], IHD = Data2[,c(13)],
-#                 LungCancer = Data2[,c(16)], Cirrhosis = Data2[,c(17)],Homicide = Data2[,c(18)],TAcc = Data2[,c(19)],
-#                 Rest = rowSums(Data2[,c(14,21,15,20)]))
-#   
-#   
-#   colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
-#   Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
-#   levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
-#                                'Homicide','Traffic accidents','Rest')
-#   Data.melt   <- Data.melt[Data.melt$year >= initial & Data.melt$year < final & Data.melt$Name == state, ]
-#   
-#   #Data.melt <- Data.melt[Data.melt$age1 < 100,]
-#   Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
-#                              '40-44','45-49','50-54','55-59','60-64','65-69',
-#    #                          "70-74","75-79","80-84","85-89","90-94","95+")
-#    "70-74","75-79","80-84","85-89","90-94","95-99","100-104","105+")
-#   Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,105,5),Inf),labels=Labels.age))
-#   Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
-#   
-#   Data.fig   <- Data.melt5[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
-#   Data.fig$Contribution <- round(Data.fig$Contribution,2)
-#   Data.fig
-# }
-
 getTable.function <- function(Data = Data.ex2,state = state.ind,initial = initial.ind,final = final.ind){
   
   Data.1 <- Data[Data$year >= initial & Data$year < final & Data$Name == state,]
   
   DT.out              <-  Data.1[, list(Contribution = sum(Contribution)), by = list(Name,Sex,Cause)]
-  #DT.out$Contribution <- round(DT.out$Contribution,2)
   total               <- DT.out[,list(Contribution= sum(Contribution)),by = list(Name,Sex)]
   total$Cause         <- '17'
   total               <- total[,c('Name','Sex','Cause','Contribution')]
@@ -62,8 +36,7 @@ shinyServer(
       state.ind <- input$state.ind
       years     <- seq(2000,2015,by = 5)
       Data      <- DT.LTmx
-      
-      #Data[Data$dx == 0,]$dx <- NA
+
       
       p <- ggplot(Data[Data$state.name == state.ind & Data$year %in% years & Data$age<=105 & Data$age>=15,], aes(x = age,y = dx,colour = as.character(year))) +
         ggtitle(paste0('Age at death distribution (dx), ', state.ind)) +
@@ -72,7 +45,7 @@ shinyServer(
         scale_colour_manual('Year', values = c('orange', 'green', 'red', 'blue')) + 
         theme_light()+
         theme(text = element_text(size=14),
-              strip.text.x = element_text(size = 14, colour = "black"))
+             strip.text.x = element_text(size = 14, colour = "black"))
       
       print(ggplotly(p,width = 1350, height = 400))
       
@@ -125,7 +98,7 @@ shinyServer(
       
       
       p <-ggplot(Data[Data$age==15,], aes(x = year,y = ex,colour=(group))) +
-        ggtitle('Life expectancy at birth') +
+        ggtitle('Life expectancy at age 15') +
         geom_line(aes(group = state.name), size= 1) +
         facet_wrap(~sex)+
         theme_light()+
@@ -133,7 +106,6 @@ shinyServer(
         scale_colour_manual('State', values = rev(colors.trends)) + 
         theme(text = element_text(size=14),
               strip.text.x = element_text(size = 14, colour = "black"))
-      #p
       print(ggplotly(p,width = 1350, height = 400))
       
     })
@@ -159,7 +131,7 @@ shinyServer(
       
       
       q <-ggplot(Data[Data$age==15,], aes(x = year,y = e.dagger,colour=(group))) +
-        ggtitle('Life disparity') +
+        ggtitle('Life disparity at age 15') +
         geom_line(aes(group = state.name), size= 1) +
         facet_wrap(~sex)+
         theme_light()+
@@ -191,7 +163,7 @@ shinyServer(
       base2 <- c(rev(brewer.pal(8,name = 'Spectral'))[1:5],rev(brewer.pal(8,name = 'Spectral'))[8],rev(brewer.pal(8,name = 'Spectral'))[7],'lightgrey')
       Data.fig$Contribution <- round(Data.fig$Contribution,2)
       p <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-        ggtitle('Decomposition of life expectancy (years)', subtitle = paste0(state.ind,', ', initial.ind,'-',final.ind))+
+        ggtitle('Decomposition of life expectancy (years)')+
         facet_wrap(~Sex)+
         scale_fill_manual('Cause of death', values = base2) + 
         geom_bar(stat = "identity",position = "stack")+
@@ -228,7 +200,7 @@ shinyServer(
       
       Data.fig$Contribution <- round(Data.fig$Contribution,2)
       q <- ggplot(Data.fig, aes(x = Age, y = Contribution, fill = Cause)) +
-        ggtitle('Decomposition of life disparity (years)', subtitle = paste0(state.ind,', ', initial.ind,'-',final.ind))+
+        ggtitle('Decomposition of life disparity (years)')+
         facet_wrap(~Sex)+
         scale_fill_manual('Cause of death', values = base2) + 
         geom_bar(stat = "identity",position = "stack")+
@@ -265,31 +237,7 @@ shinyServer(
       DT.males    <- cbind(Dmales.ex,Dmales.ed$Contribution)
       colnames(DT.males) <- c('Cause','Life expectancy','Life disparity')
       DT.males[,2:3] <- round(DT.males[,2:3],2)
-      # 
-      # Data <- Decomp_results[Decomp_results$Period1==period & Decomp_results$Sex == sx & 
-      #                          Decomp_results$Country.name==country & Decomp_results$Sources==source1 &
-      #                          Decomp_results$Age < 80,]
-      # Data <- data.table(Data)
-      # Total.cause2 <- Data[,sum(Contribution), by = list(Cause,Sex)]
-      # 
-      # cause.name.vec2  <-c('a) (A00-B99) Certain infectious and parasitic diseases', 'b) (C00-D48) Neoplasms',
-      #                      'f) (I00-I99) Diseases of the circulatory system','k) (R00-R99) Not elsewhere classified',
-      #                      'd) (F01-F99) Mental and behavioural disorders','e) (G00-G98) Diseases of the nervous system',
-      #                      'c) (E00-E88) Endocrine, nutritional and metabolic diseases' ,'g) (K00-K92) Diseases of the digestive system',  
-      #                      'i) (N00-N98) Diseases of the genitourinary system','j) (P00-P96) Perinatal  & (Q00-Q99) Congenital malformations',
-      #                      'h) (J00-J98) Diseases of the respiratory system','l) (V01-Y89) External mortality: accidents and suicide',
-      #                      'm) (X85-Y09) Homicide', 'n) Rest of causes')
-      # 
-      # Total.cause2$Cause <- cause.name.vec2
-      # Total.cause2$Contribution <- round(Total.cause2$V1,2)
-      # Total.cause2<- data.frame(Total.cause2[,c('Cause','Contribution')])
-      # Cause.Total <- data.frame(cbind(Cause='Total',Contribution=sum(Total.cause2$Contribution)))
-      # 
-      # Total.cause2 <- rbind(Total.cause2,Cause.Total)
-      # Total.cause2 <- Total.cause2[with(Total.cause2,order(Cause)),]
-      # Total.cause2 <- data.frame(Total.cause2)
-      # rownames(Total.cause2) <- NULL
-      # Total.cause2$Contribution <- as.numeric(Total.cause2$Contribution)
+      
       datatable(DT.males, options = list(paging=FALSE,ordering=T,dom = 't'),rownames = F,caption = 'Males')
     })
     
