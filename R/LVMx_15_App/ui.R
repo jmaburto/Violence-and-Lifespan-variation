@@ -19,9 +19,11 @@ library(plotly)
     fluidPage(
       titlePanel('Lifespan variation in Mexico, 1995-2015'),
       navbarPage(
-        'Aburto JM & Beltran-Sanchez H. "The impact of violence on lifespan variation in Mexico and 
-        its states, 1995-2015". Biodemography Unit, Institute of Public Health, University of Southern Denmark.',
-        position = c("fixed-bottom")),
+        # 'Aburto JM & Beltran-Sanchez H. "The impact of violence on lifespan variation in Mexico and 
+        # its states, 1995-2015". Biodemography Unit, Institute of Public Health, University of Southern Denmark.',
+        'App for the paper Homicides in Mexico increased inequality of lifespans and slowed down life expectancy gains in 2005-2015',
+        position = c("fixed-bottom")
+        ),
       
       sidebarLayout(
         sidebarPanel(

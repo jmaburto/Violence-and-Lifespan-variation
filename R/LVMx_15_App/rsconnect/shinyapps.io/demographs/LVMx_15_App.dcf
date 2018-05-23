@@ -5,9 +5,9 @@ account: demographs
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 311771
-bundleId: 1294730
+bundleId: 1388828
 url: https://demographs.shinyapps.io/LVMx_15_App/
-when: 1522404750.0367
+when: 1527074302.75751
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: Decomp_Shiny_app.R
