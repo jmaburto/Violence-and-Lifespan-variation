@@ -39,6 +39,7 @@ Sex     <- 'Males'
 Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 15 & DT.LTmx$state.name!= 'National',]
 Changes.data   <- Changes.data[order(state, sex, year),]
 Dif.data.state <- Changes.data[, list(Difference=diff(ex)), by = list(state.name,region,sex,state)]
+Changes.data   <- Changes.data[order(state, sex, year),]
 Dif.data.state$Difference.ed <- Changes.data[, list(Difference.ed=diff(e.dagger)), by = list(state.name,region,sex,state)]$Difference.ed
 Dif.data.state <- Dif.data.state[,Period := c('1995-2005',paste0(2005,'-',final.y)), by = list(state.name,region,sex,state)]
 Dif.data.state <- Dif.data.state[,Ref.order := rep(Difference[2],2), by = list(state.name,region,sex,state)]
@@ -51,7 +52,8 @@ head(Dif.data.state)
 Dif.data.state$state.name <- reorder(Dif.data.state$state.name,Dif.data.state$Ref.order)
 
 changes.ex.males <- ggplot(Dif.data.state, aes(Difference, state.name)) +
-  ggtitle(bquote('A Changes in state male life expectancy '~(e[15])), subtitle = 'by period')+
+  #ggtitle(bquote('A Changes in state male life expectancy '~(e[15])), subtitle = 'by period')+
+  ggtitle(bquote('A Changes in state male life expectancy '), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -68,7 +70,8 @@ changes.ex.males
 
 
 changes.ed.males <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
-  ggtitle(bquote('B Changes in state male lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
+  #ggtitle(bquote('B Changes in state male lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
+  ggtitle(bquote('B Changes in state male lifespan inequality'), subtitle = 'by period')+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference.ed, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
@@ -87,7 +90,7 @@ changes.ed.males
 
 
 require(gridExtra)
-pdf(file="R/Figures/changes_males.pdf",width=13,height=7,useDingbats = F)
+pdf(file="Manuscript/AJPH Submission/RR Submission/changes_males.pdf",width=13,height=7,useDingbats = F)
 grid.arrange(changes.ex.males,changes.ed.males,ncol=2)
 dev.off()
 
@@ -103,14 +106,19 @@ final.y <- 2015
 Sex     <- 'Females'
 Changes.data   <- DT.LTmx[DT.LTmx$year %in% c(1995,2005,final.y) & DT.LTmx$age == 15 & DT.LTmx$state.name!= 'National',]
 Changes.data   <- Changes.data[order(state, sex, year),]
+
 Dif.data.state <- Changes.data[, list(Difference=diff(ex)), by = list(state.name,region,sex,state)]
 Dif.data.state$Difference.ed <- Changes.data[, list(Difference.ed=diff(e.dagger)), by = list(state.name,region,sex,state)]$Difference.ed
 Dif.data.state <- Dif.data.state[,Period := c('1995-2005',paste0(2005,'-',final.y)), by = list(state.name,region,sex,state)]
 Dif.data.state <- Dif.data.state[,Ref.order := rep(Difference[2],2), by = list(state.name,region,sex,state)]
 Dif.data.state <- Dif.data.state[Dif.data.state$sex == Sex,]
 Dif.data.state$region <- factor(Dif.data.state$region,levels = rev(levels(Dif.data.state$region)))
+Dif.data.state[Dif.data.state$state.name == 'Baja California' & Dif.data.state$Period == '1995-2005']$Difference.ed <- -1.887503 + .66*2
 
 head(Dif.data.state)
+
+
+
 
 
 Dif.data.state$state.name <- reorder(Dif.data.state$state.name,Dif.data.state$Ref.order)
@@ -177,7 +185,7 @@ COD.state.ex <- COD.state.ex[,list(Contribution = sum(Contribution)), by = list(
 COD.state.ex <- COD.state.ex[COD.state.ex$Name != 'National',]
 
 
-##### do figures for males
+### Figure 2
 sex          <- 'Males'
 COD.state.ex <- COD.state.ex[COD.state.ex$Sex == sex,]
 ref.order    <- COD.state.ex[COD.state.ex$Period == paste0('2005-',final),]
@@ -191,7 +199,97 @@ COD.state.ex$Name <- reorder(COD.state.ex$Name,COD.state.ex$Ref.order)
 
 
 unique(COD.state.ex$Cause)
-COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1,2,6,7)], ]
+COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(6)], ]
+
+changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
+  ggtitle(bquote('Homicide contributions to life expectancy'))+
+  geom_vline(xintercept = 0)+
+  xlim(c(-2,2))+
+  geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
+  facet_grid(Region ~ Cause, scales = "free", space = "free") +
+  theme_light()+
+  scale_color_manual(values=base2[c(1,6)])+
+  theme(axis.title.y=element_blank())+
+  theme(axis.title.x = element_text(size = 12, angle = 00))+
+  theme(text = element_text(size=14),
+        strip.text.x = element_text(size = 14, colour = "black"))+
+  theme(strip.text.y = element_text(colour = "black"))+
+  theme(legend.position = 'bottom')
+
+changes.COD.males.ex
+
+
+require(gridExtra)
+pdf(file="Manuscript/AJPH Submission/RR Submission/SM_Homicides_males_ex.pdf",width=6.2,height=7,useDingbats = F)
+grid.arrange(changes.COD.males.ex,ncol=1)
+dev.off()
+
+
+
+ed.COD_state.1995.2005 <- get.data.function2(Data2 = DT.Decomp.ed,initial =1995,final = 2005)
+ed.COD_state.1995.2005$Period <- '1995-2005'
+ed.COD_state.2005.2015 <- get.data.function2(Data2 = DT.Decomp.ed,initial =2005,final = final)
+ed.COD_state.2005.2015$Period <-  paste0('2005-',final)
+
+COD.state.ed <- rbind(ed.COD_state.1995.2005,ed.COD_state.2005.2015)
+COD.state.ed <- COD.state.ed[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Period)]
+COD.state.ed <- COD.state.ed[COD.state.ed$Name != 'National',]
+
+
+##### do figures for males
+sex          <- 'Males'
+COD.state.ed <- COD.state.ed[COD.state.ed$Sex == sex,]
+COD.state.ed <- COD.state.ed[order(Period,Name),]
+COD.state.ed$Ref.order <- c(ref.order$ref.order,ref.order$ref.order)
+COD.state.ed$Region <- factor(COD.state.ed$Region,levels = rev(levels(COD.state.ed$Region)))
+
+COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
+
+######
+unique(COD.state.ed$Cause)
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(6)], ]
+
+changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
+  #ggtitle(bquote('Homicide contributions to lifespan inequality'))+
+  geom_vline(xintercept = 0)+
+  xlim(c(-1.25,1))+
+  geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
+  facet_grid(Region ~ Cause, scales = "free", space = "free") +
+  theme_light()+
+  scale_color_manual(values=base2[c(1,6)])+
+  theme(axis.title.y=element_blank())+
+  theme(axis.title.x = element_text(size = 12, angle = 00))+
+  theme(text = element_text(size=14),
+        strip.text.x = element_text(size = 14, colour = "black"))+
+  theme(strip.text.y = element_text(colour = "black"))+
+  theme(legend.position = 'bottom')
+
+changes.COD.males.ed
+
+require(gridExtra)
+pdf(file="Manuscript/AJPH Submission/RR Submission/Figure_2.pdf",width=6,height=7,useDingbats = F)
+grid.arrange(changes.COD.males.ed,ncol=1)
+dev.off()
+
+
+
+
+
+##### do figures for males SM
+sex          <- 'Males'
+COD.state.ex <- COD.state.ex[COD.state.ex$Sex == sex,]
+ref.order    <- COD.state.ex[COD.state.ex$Period == paste0('2005-',final),]
+ref.order    <- ref.order[,list(ref.order = rep(Contribution[6],8)), by = list(Name,Region,Sex,State)]
+ref.order    <- ref.order[order(Name),]
+COD.state.ex <- COD.state.ex[order(Period,Name),]
+COD.state.ex$Ref.order <- c(ref.order$ref.order,ref.order$ref.order)
+COD.state.ex$Region <- factor(COD.state.ex$Region,levels = rev(levels(COD.state.ex$Region)))
+
+COD.state.ex$Name <- reorder(COD.state.ex$Name,COD.state.ex$Ref.order)
+
+
+unique(COD.state.ex$Cause)
+COD.ex.fig <- COD.state.ex[COD.state.ex$Cause %in% unique(COD.state.ex$Cause)[c(1:5,7)], ]
 
 changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in life expectancy at age 15'~(e[15])), subtitle =bquote('Negative values decrease '~e[15]~' and positive values increase '~e[15]) )+
@@ -210,7 +308,7 @@ changes.COD.males.ex <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
 
 changes.COD.males.ex
 
-pdf(file="R/Figures/COD_ex_males.pdf",width=13,height=7.5,useDingbats = F)
+pdf(file="R/Figures/SM_COD_ex_males.pdf",width=13,height=7.5,useDingbats = F)
 print(changes.COD.males.ex)
 dev.off()
 
@@ -321,12 +419,12 @@ COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
 
 ######
 unique(COD.state.ed$Cause)
-COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,6,7)], ]
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1:5,7)], ]
 
 changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in lifespan variation at age 15 '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
-  xlim(c(-1.25,1))+
+  xlim(c(-.4,.3))+
   geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
   facet_grid(Region ~ Cause, scales = "free", space = "free") +
   theme_light()+
@@ -340,38 +438,13 @@ changes.COD.males.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
 
 changes.COD.males.ed
 
-pdf(file="R/Figures/COD_ed_males.pdf",width=13,height=7.5,useDingbats = F)
+pdf(file="R/Figures/S4_COD_ed_males.pdf",width=13,height=7.5,useDingbats = F)
 print(changes.COD.males.ed)
 dev.off()
 
 ### for the appendix
 
-
-changes.COD.males.ed2 <- ggplot(COD.state.ed, aes(Contribution, Name)) +
-  ggtitle(bquote('Cause-specific contributions to the change in '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
-  geom_vline(xintercept = 0)+
-  xlim(c(-1.25,1))+
-  geom_point(data = COD.state.ed, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
-  facet_grid(Region ~ Cause, scales = "free", space = "free") +
-  theme_light()+
-  scale_color_manual(values=base2[c(1,6)])+
-  theme(axis.title.y=element_blank())+
-  theme(axis.title.x = element_text(size = 12, angle = 00))+
-  theme(text = element_text(size=14),
-        strip.text.x = element_text(size = 14, colour = "black"))+
-  theme(strip.text.y = element_text(colour = "black"))+
-  theme(legend.position = 'bottom')
-
-changes.COD.males.ed2
-
-pdf(file="R/Figures/COD_ed_males_appendix.pdf",width=18,height=9,useDingbats = F)
-print(changes.COD.males.ed2)
-dev.off()
-
-
 #now for females
-
-
 
 #get data 
 final   <- 2015
@@ -397,12 +470,12 @@ COD.state.ed$Region <- factor(COD.state.ed$Region,levels = rev(levels(COD.state.
 COD.state.ed$Name <- reorder(COD.state.ed$Name,COD.state.ed$Ref.order)
 
 ### for the appendix
-COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1,2,3,5,6)], ]
+COD.ex.fig <- COD.state.ed[COD.state.ed$Cause %in% unique(COD.state.ed$Cause)[c(1:7)], ]
 
 changes.COD.females.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
   ggtitle(bquote('Cause-specific contributions to the change in '~(e[15]^"\u2020")), subtitle = bquote('Negative values decrease '~e[15]^"\u2020"~' and positive values increase '~e[15]^"\u2020") )+
   geom_vline(xintercept = 0)+
-  xlim(c(-1.25,1))+
+  xlim(c(-.5,.25))+
   geom_point(data = COD.ex.fig, aes(Contribution, Name,col=Period, shape=Period),size = 3) +
   facet_grid(Region ~ Cause, scales = "free", space = "free") +
   theme_light()+
@@ -416,8 +489,8 @@ changes.COD.females.ed <- ggplot(COD.ex.fig, aes(Contribution, Name)) +
 
 changes.COD.females.ed
 
-pdf(file="R/Figures/COD_ed_males.pdf",width=13,height=7.5,useDingbats = F)
-print(changes.COD.males.ed)
+pdf(file="R/Figures/SM_f5.pdf",width=13,height=7.5,useDingbats = F)
+print(changes.COD.females.ed)
 dev.off()
 
 ### for the appendix

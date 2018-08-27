@@ -1,0 +1,65 @@
+"","Name","Sex","Cause","Period","Ind","V1"
+"1","National","Males","AMS","1995-2005","Life expectancy",0.50845725230635
+"2","National","Males","Diabetes","1995-2005","Life expectancy",-0.572226579742214
+"3","National","Males","IHD","1995-2005","Life expectancy",0.00689587425608806
+"4","National","Males","Lung Cancer","1995-2005","Life expectancy",0.0475252217334727
+"5","National","Males","Cirrhosis","1995-2005","Life expectancy",0.0406820488991073
+"6","National","Males","Homicide","1995-2005","Life expectancy",0.4467131445262
+"7","National","Males","Traffic accidents","1995-2005","Life expectancy",-0.068966087748926
+"8","National","Males","Rest","1995-2005","Life expectancy",0.760735625649282
+"9","National","Males","AMS","2005-2015","Life expectancy",0.169233678369316
+"10","National","Males","Diabetes","2005-2015","Life expectancy",-0.0762601856074028
+"11","National","Males","IHD","2005-2015","Life expectancy",-0.116255050581444
+"12","National","Males","Lung Cancer","2005-2015","Life expectancy",0.0991141590588072
+"13","National","Males","Cirrhosis","2005-2015","Life expectancy",0.279701306511825
+"14","National","Males","Homicide","2005-2015","Life expectancy",-0.290252621715197
+"15","National","Males","Traffic accidents","2005-2015","Life expectancy",0.179909727902
+"16","National","Males","Rest","2005-2015","Life expectancy",0.303993230663693
+"17","National","Males","AMS","1995-2005","Lifespan inequality",-0.0728194096075701
+"18","National","Males","Diabetes","1995-2005","Lifespan inequality",0.0276845044018437
+"19","National","Males","IHD","1995-2005","Lifespan inequality",-0.0231943604910914
+"20","National","Males","Lung Cancer","1995-2005","Lifespan inequality",-0.00441453053357854
+"21","National","Males","Cirrhosis","1995-2005","Lifespan inequality",-0.0263885574146094
+"22","National","Males","Homicide","1995-2005","Lifespan inequality",-0.264873467114207
+"23","National","Males","Traffic accidents","1995-2005","Lifespan inequality",0.0479426896711406
+"24","National","Males","Rest","1995-2005","Lifespan inequality",-0.223435628120335
+"25","National","Males","AMS","2005-2015","Lifespan inequality",0.0045775643104502
+"26","National","Males","Diabetes","2005-2015","Lifespan inequality",-0.0292098593749017
+"27","National","Males","IHD","2005-2015","Lifespan inequality",0.00335297973637338
+"28","National","Males","Lung Cancer","2005-2015","Lifespan inequality",-0.00349123855632527
+"29","National","Males","Cirrhosis","2005-2015","Lifespan inequality",-0.104679330034333
+"30","National","Males","Homicide","2005-2015","Lifespan inequality",0.185805053035942
+"31","National","Males","Traffic accidents","2005-2015","Lifespan inequality",-0.0965305424845138
+"32","National","Males","Rest","2005-2015","Lifespan inequality",-0.104557577487819
+"33","National","Females","AMS","1995-2005","Life expectancy",0.629677817713421
+"34","National","Females","Diabetes","1995-2005","Life expectancy",-0.611733160838391
+"35","National","Females","IHD","1995-2005","Life expectancy",0.0738056569615324
+"36","National","Females","Lung Cancer","1995-2005","Life expectancy",0.0172898557600689
+"37","National","Females","Cirrhosis","1995-2005","Life expectancy",0.032229780519998
+"38","National","Females","Homicide","1995-2005","Life expectancy",0.0234717375868954
+"39","National","Females","Traffic accidents","1995-2005","Life expectancy",-0.0206729615939736
+"40","National","Females","Rest","1995-2005","Life expectancy",0.430475038429776
+"41","National","Females","AMS","2005-2015","Life expectancy",0.393345497377268
+"42","National","Females","Diabetes","2005-2015","Life expectancy",0.106315770630204
+"43","National","Females","IHD","2005-2015","Life expectancy",-0.0481519491061704
+"44","National","Females","Lung Cancer","2005-2015","Life expectancy",0.0211649336537363
+"45","National","Females","Cirrhosis","2005-2015","Life expectancy",0.059624716309095
+"46","National","Females","Homicide","2005-2015","Life expectancy",-0.0385612328084122
+"47","National","Females","Traffic accidents","2005-2015","Life expectancy",0.0441734991327181
+"48","National","Females","Rest","2005-2015","Life expectancy",0.0305943397309818
+"49","National","Females","AMS","1995-2005","Lifespan inequality",-0.236300076230279
+"50","National","Females","Diabetes","1995-2005","Lifespan inequality",0.100354016681369
+"51","National","Females","IHD","1995-2005","Lifespan inequality",-0.0227444899138476
+"52","National","Females","Lung Cancer","1995-2005","Lifespan inequality",-0.00495705169038096
+"53","National","Females","Cirrhosis","1995-2005","Lifespan inequality",-0.0174701993645971
+"54","National","Females","Homicide","1995-2005","Lifespan inequality",-0.0143922014536013
+"55","National","Females","Traffic accidents","1995-2005","Lifespan inequality",0.015096254485945
+"56","National","Females","Rest","1995-2005","Lifespan inequality",-0.156053973732494
+"57","National","Females","AMS","2005-2015","Lifespan inequality",-0.143702693125217
+"58","National","Females","Diabetes","2005-2015","Lifespan inequality",-0.0600891916592072
+"59","National","Females","IHD","2005-2015","Lifespan inequality",-0.0115057718616196
+"60","National","Females","Lung Cancer","2005-2015","Lifespan inequality",-0.00224133254609704
+"61","National","Females","Cirrhosis","2005-2015","Lifespan inequality",-0.0282780175931716
+"62","National","Females","Homicide","2005-2015","Lifespan inequality",0.0288621929547599
+"63","National","Females","Traffic accidents","2005-2015","Lifespan inequality",-0.023960322306154
+"64","National","Females","Rest","2005-2015","Lifespan inequality",0.0335542431168179

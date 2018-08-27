@@ -28,6 +28,15 @@ setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
 # These data comes from 1_1_Smoothing.R
 load('Data/Smooth_Deaths.RData')
 
+Homicides <- Dxs[Cause == 12 & state == 0, ]
+
+Homicides[age >= 15 & year %in% seq(1995,2015,5),sum(Dxs, na.rm = T), by = list(year)]$V1/
+  Homicides[year %in% seq(1995,2015,5),sum(Dxs, na.rm = T), by = list(year)]$V1
+
+
+Homicides[age >= 15,sum(Dxs, na.rm = T)]/
+  Homicides[,sum(Dxs, na.rm = T)]
+
 #Calculate proportions of causes of death by age (remember to take care of 0 when applying to rates)
 Dxs <- Dxs[,Dxs.prop := Dxs/sum(Dxs), by = list(year,sex,state,age)]
 Dxs[is.na(Dxs.prop),]$Dxs.prop <- 0
@@ -55,8 +64,8 @@ Dx <- data.table(Dx)
 Nx <- data.table(Nx)
 Dx <- Dx[,c('year','sex','state','age','Dx')]
 Nx <- Nx[,c('year','sex','state','age','Nx')]
-Dx <- Dx[year >= 1995 & year <= 2015,]
-Nx <- Nx[year >= 1995 & year <= 2015,]
+Dx <- Dx[year >= 1995 & year <= 2016,]
+Nx <- Nx[year >= 1995 & year <= 2016,]
 # order all datasets accordingly
 Dx  <- Dx[order(year,sex,state,age),]
 Nx  <- Nx[order(year,sex,state,age),]

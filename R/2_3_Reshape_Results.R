@@ -69,6 +69,9 @@ source('R/Functions_2.R')
 
 ###########################################
 
+# Send mortality above age 85 to rest (16)
+
+
 # adding region name columns is then easy
 DT.Decomp.ed  <- cbind(region=region.recvec[as.character(DT.Decomp.ed$state)],DT.Decomp.ed)
 DT.Decomp.ex  <- cbind(region=region.recvec[as.character(DT.Decomp.ex$state)],DT.Decomp.ex)

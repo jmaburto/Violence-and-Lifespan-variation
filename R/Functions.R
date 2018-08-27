@@ -7,14 +7,20 @@ get.data.function2 <-  function(Data2 = DT.Decomp.ex,initial = initial.ind,final
   
   colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
   Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  Data.melt[Data.melt$age1 >= 85,]$Cause <- '8'
+  Data.melt <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,age1,Cause)]
+  Data.melt <- Data.melt[order(Name,Region,Sex,State,year,Cause,age1),]
+  
   levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
                                'Homicide','Traffic accidents','Rest')
-  Data.melt <- Data.melt[Data.melt$age1 < 100,]
+  #Data.melt <- Data.melt[Data.melt$age1 < 100,]
   Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
                              '40-44','45-49','50-54','55-59','60-64','65-69',
                              "70-74","75-79","80-84","85-89","90-94","95+")
   Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,95,5),Inf),labels=Labels.age))
   Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
+  
+  Data.melt5 <- Data.melt5[Data.melt5$Age != '85-89' & Data.melt5$Age != '90-94' & Data.melt5$Age != '95+',]
   
   Data.fig   <- Data.melt5[Data.melt5$year >= initial & Data.melt5$year < final, ]
   Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
@@ -28,8 +34,14 @@ getData.function.g <- function(Data2 = DT.Decomp.ex,state = state.ind,initial = 
   
   colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
   Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  Data.melt[Data.melt$age1>= 85]$Cause <- '8'
+  
   levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
                                'Homicide','Traffic accidents','Rest')
+  #Send  mortality from age 85 to rest
+  
+  Data.melt <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,age1,Cause)]
+  
   Data.melt <- Data.melt[Data.melt$age1 < 100,]
   Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
                              '40-44','45-49','50-54','55-59','60-64','65-69',
@@ -41,6 +53,35 @@ getData.function.g <- function(Data2 = DT.Decomp.ex,state = state.ind,initial = 
   Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
   Data.fig   <- Data.fig[Data.fig$Name == state,]
   Data.fig$Contribution <- round(Data.fig$Contribution,2)
+  Data.fig
+}
+
+getData.function.table <- function(Data2 = DT.Decomp.ex,state = state.ind,initial = initial.ind,final = final.ind){
+  Data <- cbind(Data2[,1:6], AMS = rowSums(Data2[,c(7,10,8,9,12)]), Diabetes = Data2[,c(11)], IHD = Data2[,c(13)],
+                LungCancer = Data2[,c(16)], Cirrhosis = Data2[,c(17)],Homicide = Data2[,c(18)],TAcc = Data2[,c(19)],
+                Rest = rowSums(Data2[,c(14,21,15,20)]))
+  
+  colnames(Data) <- c('Name','Region','Sex','State','year','age1',1:8)
+  Data.melt               <- melt(Data, id.vars = 1:6,variable.name = 'Cause',value.name = 'Contribution')
+  Data.melt[Data.melt$age1>= 85]$Cause <- '8'
+  
+  levels(Data.melt$Cause) <- c('AMS','Diabetes','IHD','Lung Cancer','Cirrhosis',
+                               'Homicide','Traffic accidents','Rest')
+  #Send  mortality from age 85 to rest
+  
+  Data.melt <- Data.melt[,list(Contribution = sum(Contribution, na.rm = F)), by = list(Name,Region,Sex,State,year,age1,Cause)]
+  
+  #Data.melt <- Data.melt[Data.melt$age1 < 100,]
+  Labels.age            <- c('0-4', '5-9', '10-14', '15-19', '20-24','25-29','30-34','35-39',
+                             '40-44','45-49','50-54','55-59','60-64','65-69',
+                             "70-74","75-79","80-84","85-89","90-94","95+")
+  Data.melt$Age       <- (cut(Data.melt$age1+1, breaks=c(seq(0,95,5),Inf),labels=Labels.age))
+  Data.melt5 <- Data.melt[,list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,year,Cause,Age)]
+  
+  Data.fig   <- Data.melt5[Data.melt5$year >= initial & Data.melt5$year < final, ]
+  Data.fig   <- Data.fig[, list(Contribution = sum(Contribution)), by = list(Name,Region,Sex,State,Cause,Age)] 
+  Data.fig   <- Data.fig[Data.fig$Name == state,]
+  
   Data.fig
 }
 
