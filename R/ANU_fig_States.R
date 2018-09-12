@@ -68,11 +68,11 @@ changes.ex.males
 
 changes.ed.males <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
   #ggtitle(bquote('B Changes in state male lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
-  ggtitle(bquote('B Changes in state male lifespan inequality'), subtitle = 'by period')+
+  ggtitle(bquote('Changes in state male lifespan inequality'))+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference.ed, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
-  xlab("Difference") +
+  xlab("Change in years") +
   theme_light()+
   scale_color_manual(values=base2[c(1,6)])+
   theme(axis.title.y=element_blank())+
@@ -87,8 +87,8 @@ changes.ed.males
 
 
 require(gridExtra)
-pdf(file="Manuscript/AJPH Submission/RR Submission/changes_males.pdf",width=13,height=7,useDingbats = F)
-grid.arrange(changes.ex.males,changes.ed.males,ncol=2)
+pdf(file="R/Figure_3.pdf",width=7,height=7,useDingbats = F)
+changes.ed.males
 dev.off()
 
 
