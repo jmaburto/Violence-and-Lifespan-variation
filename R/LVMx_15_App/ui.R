@@ -5,7 +5,7 @@ library(data.table)
 library(DT)
 library(plotly)
 
-#https://jmaburto.shinyapps.io/LVMx_App/
+#https://demographs.shinyapps.io/LVMx_15_App/
 
   states <- c("National","Aguascalientes","Baja California","Baja California Sur","Campeche",
                "Coahuila","Colima","Chiapas","Chihuahua","Mexico City","Durango",

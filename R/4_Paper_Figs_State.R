@@ -53,11 +53,13 @@ Dif.data.state$state.name <- reorder(Dif.data.state$state.name,Dif.data.state$Re
 
 changes.ex.males <- ggplot(Dif.data.state, aes(Difference, state.name)) +
   #ggtitle(bquote('A Changes in state male life expectancy '~(e[15])), subtitle = 'by period')+
-  ggtitle(bquote('A Changes in state male life expectancy '), subtitle = 'by period')+
+  ggtitle(bquote('A Changes in male life expectancy'))+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
+  xlab("Change in years of life") +
   theme_light()+
+  scale_x_continuous(breaks = seq(-1,2,.5),limits = c(-.8,1.75),minor_breaks = seq(-1.25,2.25,.5))+ 
   scale_color_manual(values=base2[c(1,6)])+
   theme(axis.title.y=element_blank())+
   theme(axis.title.x = element_text(size = 12, angle = 00))+
@@ -71,12 +73,13 @@ changes.ex.males
 
 changes.ed.males <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
   #ggtitle(bquote('B Changes in state male lifespan variation '~(e[15]^"\u2020")), subtitle = 'by period')+
-  ggtitle(bquote('B Changes in state male lifespan inequality'), subtitle = 'by period')+
+  ggtitle(bquote('B Changes in male lifespan inequality'))+
   geom_vline(xintercept = 0)+
   geom_point(data = Dif.data.state, aes(Difference.ed, state.name,col=Period, shape=Period),size = 3) +
   facet_grid(region ~., scales = "free", space = "free") +
-  xlab("Difference") +
+  xlab("Change in years of life") +
   theme_light()+
+  scale_x_continuous(breaks = seq(-1,2,.5),limits = c(-.8,1.75),minor_breaks = seq(-1.25,2.25,.5))+ 
   scale_color_manual(values=base2[c(1,6)])+
   theme(axis.title.y=element_blank())+
   theme(axis.title.x = element_text(size = 12, angle = 00))+
@@ -87,10 +90,8 @@ changes.ed.males <- ggplot(Dif.data.state, aes(Difference.ed, state.name)) +
 
 changes.ed.males
 
-
-
 require(gridExtra)
-pdf(file="Manuscript/AJPH Submission/RR Submission/changes_males.pdf",width=13,height=7,useDingbats = F)
+pdf(file="Manuscript/AJPH Submission/RR2 Submission/changes_males.pdf",width=13,height=7,useDingbats = F)
 grid.arrange(changes.ex.males,changes.ed.males,ncol=2)
 dev.off()
 
