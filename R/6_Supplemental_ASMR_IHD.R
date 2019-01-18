@@ -64,7 +64,9 @@ Dxs <- Dxs[order(year,sex,state,Cause,age),]
 
 Dx <- Dx[state==0,]
 Nx <- Nx[state==0,]
-Dxs<- Dxs[state== 0 & Cause ==12,]
+
+#Select cause of death
+Dxs<- Dxs[state== 0 & Cause ==7,]
 
 
 # merge population to Dx 
@@ -107,7 +109,7 @@ p <-ggplot(fig.data, aes(x = year,y = V1,colour=sex, group = factor(sex))) +
   ggtitle('Standardized homicide rates by sex') +
   geom_line(aes(),show.legend = F) +
   theme_light()+
-  labs(y = "Homicide rate")+
+  labs(y = "IHD rate")+
   scale_colour_manual('Sex', values = c('red','blue')) 
   
 p
@@ -117,9 +119,16 @@ pdf(file="Manuscript/AJPH Submission/RR Submission/ASMR.pdf",width=7,height=4,us
 p
 dev.off()
 
-x <- fig.data[fig.data$sex == 1,]
+year1 <- 2005
+year2 <- 2015
 
-(x[year == 2015,]$V1 - x[year == 2005,]$V1)/x[year == 2005,]$V1*100
+x <- fig.data[fig.data$sex == 2,]
+
+x[year == year1,]$V1
+
+x[year == year2,]$V1
+
+(x[year == year2,]$V1 - x[year == year1,]$V1)/x[year == year1,]$V1*100
 
 
 
