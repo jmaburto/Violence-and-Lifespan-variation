@@ -12,7 +12,7 @@ rm(list=ls(all=TRUE))
 library(data.table)
 library(reshape2)
 
-setwd("C:/Users/jmaburto/Documents/GitHub/Violence-and-Lifespan-variation")
+setwd("C:/Users/jmaburto.SAM//Documents/GitHub/Violence-and-Lifespan-variation")
 
 #### sex=1 <- males
 #### 1. Infectious and respiratory diseases, 2. Cancers, 3. Circulatory, 
